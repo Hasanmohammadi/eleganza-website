@@ -1,5 +1,10 @@
-allowBuilds:
-  esbuild: set this to true or false
-  sharp: set this to true or false
 overrides:
   update-browserslist-db: 1.2.3
+
+onlyBuiltDependencies:
+  - esbuild
+  - sharp
+
+allowBuilds:
+  esbuild: true
+  sharp: true
