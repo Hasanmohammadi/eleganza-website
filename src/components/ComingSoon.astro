@@ -1,0 +1,175 @@
+---
+import LanguageSwitcher from './LanguageSwitcher.astro';
+import type { Locale, Translation } from '../i18n/translations';
+
+interface Props {
+  lang: Locale;
+  t: Translation;
+}
+
+const { lang, t } = Astro.props;
+---
+
+<main class="relative min-h-screen overflow-hidden flex flex-col">
+  <!-- بلاب‌های گرادیانی پس‌زمینه -->
+  <div class="pointer-events-none absolute inset-0 -z-10">
+    <div class="blob blob-1 absolute w-[38rem] h-[38rem] rounded-full bg-brand/30 blur-3xl"></div>
+    <div class="blob blob-2 absolute w-[28rem] h-[28rem] rounded-full bg-fuchsia-500/20 blur-3xl"></div>
+    <div class="blob blob-3 absolute w-[22rem] h-[22rem] rounded-full bg-cyan-400/10 blur-3xl"></div>
+  </div>
+
+  <header class="w-full flex justify-between items-center px-6 md:px-10 py-6">
+    <div class="logo-mark opacity-0 font-bold tracking-tight text-lg">●</div>
+    <LanguageSwitcher current={lang} />
+  </header>
+
+  <div class="flex-1 flex flex-col items-center justify-center px-6 text-center">
+    <span
+      class="cs-badge opacity-0 translate-y-4 inline-block mb-6 px-4 py-1.5 rounded-full text-xs md:text-sm border border-brand/40 bg-brand/10 text-brand-light tracking-wide"
+    >
+      {t.badge}
+    </span>
+
+    <h1 class="cs-title opacity-0 translate-y-6 text-3xl sm:text-5xl md:text-6xl font-extrabold leading-tight max-w-3xl">
+      {t.title}
+      <span class="block bg-gradient-to-r from-brand-light via-fuchsia-400 to-cyan-300 bg-clip-text text-transparent">
+        {t.highlight}
+      </span>
+    </h1>
+
+    <p class="cs-subtitle opacity-0 translate-y-6 mt-6 text-gray-400 max-w-lg text-base md:text-lg">
+      {t.subtitle}
+    </p>
+
+    <!-- شمارش معکوس -->
+    <div class="cs-countdown opacity-0 translate-y-6 mt-10 grid grid-cols-4 gap-3 md:gap-5" dir="ltr">
+      <div class="countdown-box">
+        <div class="countdown-num" data-unit="days">00</div>
+        <div class="countdown-label">{t.days}</div>
+      </div>
+      <div class="countdown-box">
+        <div class="countdown-num" data-unit="hours">00</div>
+        <div class="countdown-label">{t.hours}</div>
+      </div>
+      <div class="countdown-box">
+        <div class="countdown-num" data-unit="minutes">00</div>
+        <div class="countdown-label">{t.minutes}</div>
+      </div>
+      <div class="countdown-box">
+        <div class="countdown-num" data-unit="seconds">00</div>
+        <div class="countdown-label">{t.seconds}</div>
+      </div>
+    </div>
+
+    <!-- فرم ایمیل -->
+    <form class="cs-form opacity-0 translate-y-6 mt-10 w-full max-w-md flex flex-col sm:flex-row gap-3" id="notify-form">
+      <input
+        type="email"
+        required
+        placeholder={t.emailPlaceholder}
+        class="flex-1 px-4 py-3 rounded-full bg-white/5 border border-white/15 text-sm placeholder:text-gray-500 focus:outline-none focus:border-brand-light transition-colors"
+      />
+      <button
+        type="submit"
+        class="px-6 py-3 rounded-full bg-brand hover:bg-brand-light transition-colors text-sm font-medium whitespace-nowrap"
+      >
+        {t.notifyBtn}
+      </button>
+    </form>
+    <p class="cs-success hidden mt-4 text-sm text-emerald-400">{t.successMsg}</p>
+  </div>
+
+  <footer class="cs-footer opacity-0 text-center text-xs text-gray-600 py-6">
+    &copy; {new Date().getFullYear()} — {t.footer}
+  </footer>
+</main>
+
+<style>
+  .countdown-box {
+    @apply flex flex-col items-center justify-center bg-white/5 border border-white/10 rounded-2xl px-3 py-3 md:px-5 md:py-4 min-w-[64px] md:min-w-[84px];
+  }
+  .countdown-num {
+    @apply text-2xl md:text-4xl font-bold tabular-nums;
+  }
+  .countdown-label {
+    @apply text-[10px] md:text-xs text-gray-500 mt-1;
+  }
+  .blob {
+    animation: float 12s ease-in-out infinite;
+  }
+  .blob-1 {
+    top: -10%;
+    inset-inline-start: -10%;
+  }
+  .blob-2 {
+    bottom: -5%;
+    inset-inline-end: -5%;
+    animation-delay: -4s;
+  }
+  .blob-3 {
+    top: 40%;
+    inset-inline-start: 45%;
+    animation-delay: -8s;
+  }
+  @keyframes float {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(3%, 5%) scale(1.08); }
+  }
+</style>
+
+<script>
+  import gsap from 'gsap';
+
+  // انیمیشن ورود عناصر
+  const tl = gsap.timeline({ defaults: { ease: 'power3.out', duration: 0.9 } });
+  tl.to('.logo-mark', { opacity: 1, duration: 0.6 })
+    .to('.lang-switcher', { opacity: 1, duration: 0.6 }, '<')
+    .to('.cs-badge', { opacity: 1, y: 0 }, '-=0.3')
+    .to('.cs-title', { opacity: 1, y: 0 }, '-=0.5')
+    .to('.cs-subtitle', { opacity: 1, y: 0 }, '-=0.6')
+    .to('.cs-countdown', { opacity: 1, y: 0 }, '-=0.6')
+    .to('.cs-form', { opacity: 1, y: 0 }, '-=0.6')
+    .to('.cs-footer', { opacity: 1, duration: 0.6 }, '-=0.4');
+
+  // شمارش معکوس تا ۳۰ روز آینده از لحظه بارگذاری
+  const target = new Date();
+  target.setDate(target.getDate() + 30);
+
+  const daysEl = document.querySelector('[data-unit="days"]') as HTMLElement;
+  const hoursEl = document.querySelector('[data-unit="hours"]') as HTMLElement;
+  const minutesEl = document.querySelector('[data-unit="minutes"]') as HTMLElement;
+  const secondsEl = document.querySelector('[data-unit="seconds"]') as HTMLElement;
+
+  function pad(n: number): string {
+    return n.toString().padStart(2, '0');
+  }
+
+  function tick(): void {
+    const diff = Math.max(0, target.getTime() - Date.now());
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+    const minutes = Math.floor((diff / (1000 * 60)) % 60);
+    const seconds = Math.floor((diff / 1000) % 60);
+
+    if (daysEl) daysEl.textContent = pad(days);
+    if (hoursEl) hoursEl.textContent = pad(hours);
+    if (minutesEl) minutesEl.textContent = pad(minutes);
+    if (secondsEl) secondsEl.textContent = pad(seconds);
+  }
+
+  tick();
+  setInterval(tick, 1000);
+
+  // فرم ایمیل (نمونه — بدون بک‌اند واقعی)
+  const form = document.getElementById('notify-form') as HTMLFormElement | null;
+  const successMsg = document.querySelector('.cs-success') as HTMLElement | null;
+
+  form?.addEventListener('submit', (e: SubmitEvent) => {
+    e.preventDefault();
+    form.reset();
+    if (successMsg) {
+      successMsg.classList.remove('hidden');
+      gsap.fromTo(successMsg, { opacity: 0, y: 6 }, { opacity: 1, y: 0, duration: 0.4 });
+    }
+  });
+</script>

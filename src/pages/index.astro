@@ -1,0 +1,27 @@
+---
+// این صفحه فقط یک ریدایرکت هوشمنده: بر اساس زبان مرورگر کاربر رو
+// به /en/ یا /fa/ یا /ar/ می‌فرسته. اگه زبان مرورگر پشتیبانی نشه، fa پیش‌فرضه.
+---
+
+<!doctype html>
+<html lang="fa">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Redirecting...</title>
+    <script>
+      const supported = ['en', 'fa', 'ar'];
+      const browserLang = navigator.language.slice(0, 2);
+      const target = supported.includes(browserLang) ? browserLang : 'fa';
+      window.location.replace(`/${target}/`);
+    </script>
+    <noscript>
+      <meta http-equiv="refresh" content="0; url=/fa/" />
+    </noscript>
+  </head>
+  <body>
+    <p style="font-family: sans-serif; padding: 2rem; text-align: center;">
+      Redirecting… <a href="/fa/">Click here</a> if you are not redirected automatically.
+    </p>
+  </body>
+</html>

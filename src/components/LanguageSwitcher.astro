@@ -1,0 +1,28 @@
+---
+import type { Locale } from '../i18n/translations';
+import { locales } from '../i18n/translations';
+
+interface Props {
+  current: Locale;
+}
+
+const { current } = Astro.props;
+const langs = Object.keys(locales) as Locale[];
+---
+
+<div class="lang-switcher flex gap-2 opacity-0">
+  {
+    langs.map((lang) => (
+      <a
+        href={`/${lang}/`}
+        class={`px-3 py-1.5 rounded-full text-sm border transition-colors ${
+          lang === current
+            ? 'bg-brand border-brand text-white'
+            : 'border-white/15 text-gray-400 hover:border-white/40 hover:text-white'
+        }`}
+      >
+        {locales[lang].label}
+      </a>
+    ))
+  }
+</div>

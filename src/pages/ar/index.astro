@@ -1,0 +1,12 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import ComingSoon from '../../components/ComingSoon.astro';
+import { translations } from '../../i18n/translations';
+
+const lang = 'ar' as const;
+const t = translations[lang];
+---
+
+<Layout title="قريباً" description={t.subtitle} lang={lang}>
+  <ComingSoon lang={lang} t={t} />
+</Layout>
