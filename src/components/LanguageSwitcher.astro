@@ -10,15 +10,15 @@ const { current } = Astro.props;
 const langs = Object.keys(locales) as Locale[];
 ---
 
-<div class="lang-switcher flex gap-2 opacity-0">
+<div class="lang-switcher flex gap-2">
   {
     langs.map((lang) => (
       <a
         href={`/${lang}/`}
-        class={`px-3 py-1.5 rounded-full text-sm border transition-colors ${
+        class={`lang-btn px-3 py-1.5 rounded-sm text-xs tracking-wide border transition-colors ${
           lang === current
-            ? 'bg-brand border-brand text-white'
-            : 'border-white/15 text-gray-400 hover:border-white/40 hover:text-white'
+            ? 'bg-gold border-gold text-charcoal font-medium'
+            : 'border-platinum/30 text-platinum hover:border-gold/60 hover:text-gold'
         }`}
       >
         {locales[lang].label}
@@ -26,3 +26,12 @@ const langs = Object.keys(locales) as Locale[];
     ))
   }
 </div>
+
+<style>
+  .lang-btn {
+    transition: transform 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+  }
+  .lang-btn:hover {
+    transform: translateY(-2px);
+  }
+</style>

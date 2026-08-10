@@ -1,48 +1,46 @@
-# Astro Coming Soon Starter (pnpm + TypeScript + Tailwind + GSAP + i18n)
+# Eleganza United Business — Website (Astro SSG)
 
-پروژه استارتر Astro با یک صفحه‌ی «به‌زودی» (Coming Soon) انیمیشنی و سه‌زبانه.
+صفحه‌ی «به‌زودی» برای Eleganza United Business — کاملاً استاتیک، سه‌زبانه، و
+بر اساس سند برند رسمی شرکت.
 
 ## چی توشه؟
 
-- ⚡ Astro با خروجی استاتیک (SSG)
-- 🟦 TypeScript کامل (strict mode)
-- 🎨 Tailwind CSS
-- 🎬 GSAP برای انیمیشن ورود عناصر + بلاب‌های گرادیانی متحرک در پس‌زمینه
-- ⏳ شمارش معکوس زنده (روز / ساعت / دقیقه / ثانیه)
-- ✉️ فرم ثبت ایمیل (فرانت‌اند فقط، بدون بک‌اند واقعی — جای اتصال به API خودته)
-- 🌐 سه زبانه: **English / فارسی / العربية** با تشخیص خودکار جهت متن (RTL/LTR)
-- 📦 پکیج‌منیجر: **pnpm**
+- ⚡ Astro با خروجی کاملاً استاتیک (SSG)
+- 🟦 TypeScript کامل
+- 🎨 پالت رنگی دقیق برند:
+  - Royal Gold `#D4AF37` / Champagne Gold `#F3E6B3`
+  - Deep Charcoal Black `#0D0D0D` / Midnight Navy `#0B1F3A`
+  - Platinum Silver `#B9BDC5` / Warm White `#F7F6F2`
+- 🖋 فونت‌های اختصاصی هر زبان: Cormorant Garamond (EN), Vazirmatn (FA), Amiri + Tajawal (AR)
+- 🎬 انیمیشن‌های فراوان با GSAP:
+  - تایم‌لاین ورود چندمرحله‌ای (emblem، بج، برند، هدلاین، حلقه، شمارش معکوس، فرم، پیام‌های برند)
+  - دو حلقه‌ی چرخان در جهت مخالف دور نشان حوزه‌های فعالیت
+  - ذرات طلایی شناور در پس‌زمینه
+  - شیمر بی‌پایان روی متن برند (گرادیان متحرک)
+  - نبض نورانی پشت حلقه، شناوری نشان برند، تاب‌خوردن آیکون‌های پیام برند
+  - پاپ‌شدن ارقام شمارش معکوس هر بار که عوض می‌شن
+  - پارالاکس حلقه با حرکت موس، هاور فنری روی آیکون‌های حوزه‌های فعالیت
+  - رعایت `prefers-reduced-motion` برای کاربرانی که انیمیشن کمتر می‌خوان
+- ⭕ عنصر امضادار: حلقه‌ی شش حوزه‌ی فعالیت (Holding, Construction, Real Estate,
+  Investment, Oil & Gas, Trading) — از بخش «Industry Application» سند برند
+- 🌐 سه‌زبانه: English / فارسی / العربية
+- 📦 پکیج‌منیجر: **npm**
 
 ## نصب و اجرا
 
-اگه pnpm نصب نداری:
 ```bash
-npm install -g pnpm
+npm install
+npm run dev
 ```
 
-بعد:
-```bash
-pnpm install
-pnpm dev
-```
+روی `http://localhost:4321` بالا میاد. `/` بر اساس زبان مرورگرت به
+`/en/`, `/fa/` یا `/ar/` هدایتت می‌کنه.
 
-پروژه روی این آدرس بالا میاد:
-```
-http://localhost:4321
-```
-
-وقتی وارد `/` بشی، خودش بر اساس زبان مرورگرت به `/en/`, `/fa/` یا `/ar/` هدایتت می‌کنه.
-می‌تونی مستقیم هم بری:
-
-- `http://localhost:4321/en/`
-- `http://localhost:4321/fa/`
-- `http://localhost:4321/ar/`
-
-## دستورات دیگه
+## Build نهایی
 
 ```bash
-pnpm build     # بیلد نهایی استاتیک (داخل پوشه dist)
-pnpm preview   # پیش‌نمایش نسخه بیلد شده
+npm run build     # خروجی استاتیک داخل dist/
+npm run preview
 ```
 
 ## ساختار پروژه
@@ -50,39 +48,27 @@ pnpm preview   # پیش‌نمایش نسخه بیلد شده
 ```
 src/
   components/
-    ComingSoon.astro       # کل صفحه Coming Soon (انیمیشن + شمارش معکوس + فرم)
-    LanguageSwitcher.astro # دکمه‌های تعویض زبان
+    ComingSoon.astro      # کل صفحه + همه‌ی انیمیشن‌های GSAP
+    IndustryRing.astro     # عنصر امضادار — حلقه‌ی شش حوزه‌ی فعالیت
+    EmblemMark.astro        # نشان برند (SVG گرادیان طلایی)
+    LanguageSwitcher.astro
   i18n/
-    translations.ts        # متن‌های هر سه زبان + تنظیمات جهت (rtl/ltr)
+    translations.ts          # متن هر سه زبان، بر اساس تگ‌لاین و پیام برند
   layouts/
-    Layout.astro           # لایوت پایه؛ lang و dir رو خودکار ست می‌کنه
+    Layout.astro              # لود فونت مخصوص هر زبان + lang/dir
   pages/
-    index.astro             # ریدایرکت خودکار بر اساس زبان مرورگر
+    index.astro                 # ریدایرکت خودکار بر اساس زبان مرورگر
     en/index.astro
     fa/index.astro
     ar/index.astro
-  styles/
-    global.css              # Tailwind + فونت‌های Vazirmatn (فارسی) و Cairo (عربی)
+tailwind.config.mjs            # پالت رنگی دقیق برند
 ```
 
-## نکات مهم برای شخصی‌سازی
+## شخصی‌سازی
 
-- **تاریخ شمارش معکوس**: در `ComingSoon.astro` همین الان روی «۳۰ روز از لحظه بازدید» تنظیم شده.
-  برای یه تاریخ ثابت، این خط رو عوض کن:
-  ```ts
-  const target = new Date();
-  target.setDate(target.getDate() + 30);
-  ```
-  به یه تاریخ مشخص مثل:
-  ```ts
-  const target = new Date('2026-12-31T00:00:00');
-  ```
-
-- **فرم ایمیل**: الان فقط پیام موفقیت نشون می‌ده. برای اتصال واقعی، داخل تابع
-  `submit` در همون فایل، یه `fetch` به API خودت اضافه کن.
-
-- **افزودن زبان جدید**: کافیه توی `src/i18n/translations.ts` یه locale جدید اضافه کنی
-  و یه پوشه‌ی جدید مثل `src/pages/de/index.astro` مشابه بقیه بسازی.
-
-- چون از **Islands Architecture** استفاده می‌شه، جاوااسکریپت GSAP فقط همون‌جایی
-  که لازمه لود می‌شه؛ بقیه سایت سبک می‌مونه.
+- **تاریخ شمارش معکوس**: در `ComingSoon.astro`، الان «۳۰ روز از لحظه‌ی بازدید»ه.
+  برای تاریخ ثابت: `const target = new Date('2026-12-31T00:00:00');`
+- **فرم ایمیل**: فعلاً فقط پیام موفقیت نشون می‌ده — برای اتصال واقعی یه `fetch`
+  به API خودت داخل event listener فرم اضافه کن.
+- **شدت انیمیشن**: اگه جایی زیاد به‌نظر رسید، `duration` و `stagger`های تایم‌لاین
+  اصلی رو در پایین فایل `ComingSoon.astro` تنظیم کن.

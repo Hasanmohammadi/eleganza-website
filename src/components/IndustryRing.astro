@@ -1,0 +1,126 @@
+---
+import type { Industry } from '../i18n/translations';
+
+interface Props {
+  industries: Industry[];
+  label: string;
+}
+
+const { industries, label } = Astro.props;
+const radius = 42;
+
+const icons = [
+  // Landmark
+  '<path d="M3 21h18"/><path d="M4 21V10"/><path d="M20 21V10"/><path d="M8 21V10"/><path d="M12 21V10"/><path d="M16 21V10"/><path d="M2 10l10-6 10 6"/>',
+  // HardHat
+  '<path d="M4 18h16"/><path d="M6 18v-2a6 6 0 0 1 12 0v2"/><path d="M10 10V6"/><path d="M14 10V6"/><path d="M3 18h2"/><path d="M19 18h2"/>',
+  // Building2
+  '<rect x="6" y="3" width="12" height="18" rx="1"/><path d="M9 7h1M14 7h1M9 11h1M14 11h1M9 15h1M14 15h1"/><path d="M3 21h18"/>',
+  // TrendingUp
+  '<path d="M3 17l6-6 4 4 7-8"/><path d="M15 6h5v5"/>',
+  // Flame
+  '<path d="M12 22c4 0 6-3 6-6.5 0-2.5-1.5-4-2.5-5.5C14.5 8 14 6 14 4c-3 2-5 5-5 8-1-.5-1.5-2-1.5-3.5C5.5 10 5 12.5 5 15c0 3.5 3 7 7 7Z"/>',
+  // Globe
+  '<circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3c2.5 2.5 4 5.7 4 9s-1.5 6.5-4 9c-2.5-2.5-4-5.7-4-9s1.5-6.5 4-9Z"/>',
+];
+
+const positions = industries.map((industry, i) => {
+  const angle = (-90 + i * 60) * (Math.PI / 180);
+  const x = 50 + radius * Math.cos(angle);
+  const y = 50 + radius * Math.sin(angle);
+  return { ...industry, x, y, icon: icons[i] };
+});
+---
+
+<div class="industry-ring relative w-64 h-64 sm:w-80 sm:h-80 mx-auto">
+  <!-- حلقه‌ی نقطه‌چین طلایی — می‌چرخه یه طرف -->
+  <svg viewBox="0 0 200 200" class="ring-outer absolute inset-0 w-full h-full">
+    <circle cx="100" cy="100" r="92" fill="none" stroke="#D4AF37" stroke-opacity="0.4" stroke-width="1" stroke-dasharray="2 8" />
+  </svg>
+  <!-- حلقه‌ی توپر ظریف — می‌چرخه طرف مخالف -->
+  <svg viewBox="0 0 200 200" class="ring-inner absolute inset-0 w-full h-full">
+    <circle cx="100" cy="100" r="70" fill="none" stroke="#B9BDC5" stroke-opacity="0.2" stroke-width="1" />
+  </svg>
+  <!-- هاله‌ی نورانی پشت مرکز -->
+  <div class="ring-glow absolute inset-0 rounded-full" style="background: radial-gradient(circle, rgba(212,175,55,0.18), transparent 60%);"></div>
+
+  {
+    positions.map((p) => (
+      <div
+        class="industry-item absolute flex flex-col items-center gap-1.5 -translate-x-1/2 -translate-y-1/2 cursor-default"
+        style={`left:${p.x}%; top:${p.y}%`}
+      >
+        <span class="industry-icon flex items-center justify-center w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-navy border border-gold/40 text-gold">
+          <svg
+            viewBox="0 0 24 24"
+            class="w-4 h-4 sm:w-5 sm:h-5"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.75"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            set:html={p.icon}
+          />
+        </span>
+        <span class="text-[10px] sm:text-xs text-platinum whitespace-nowrap">{p.label}</span>
+      </div>
+    ))
+  }
+
+  <div class="absolute inset-0 flex items-center justify-center px-8 text-center">
+    <span class="ring-label text-[10px] sm:text-xs tracking-widest2 text-gold/80 uppercase font-display">
+      {label}
+    </span>
+  </div>
+</div>
+
+<script>
+  import gsap from 'gsap';
+
+  const ring = document.querySelector('.industry-ring') as HTMLElement | null;
+  if (ring) {
+    const outer = ring.querySelector('.ring-outer');
+    const inner = ring.querySelector('.ring-inner');
+    const glow = ring.querySelector('.ring-glow');
+    const items = ring.querySelectorAll('.industry-item');
+
+    // چرخش پیوسته‌ی دو حلقه در دو جهت مخالف
+    gsap.to(outer, { rotate: 360, duration: 60, repeat: -1, ease: 'none', transformOrigin: '50% 50%' });
+    gsap.to(inner, { rotate: -360, duration: 90, repeat: -1, ease: 'none', transformOrigin: '50% 50%' });
+
+    // نبض نورانی پشت حلقه
+    gsap.to(glow, { opacity: 0.4, scale: 1.15, duration: 2.4, repeat: -1, yoyo: true, ease: 'sine.inOut', transformOrigin: '50% 50%' });
+
+    // ورود فنری آیکون‌ها یکی‌یکی
+    gsap.set(items, { opacity: 0, scale: 0.3 });
+    gsap.to(items, {
+      opacity: 1,
+      scale: 1,
+      duration: 0.8,
+      stagger: 0.12,
+      ease: 'back.out(2.2)',
+      delay: 0.6,
+    });
+
+    // هاور: بزرگ‌شدن ملایم هر آیکون
+    items.forEach((item) => {
+      const icon = item.querySelector('.industry-icon');
+      item.addEventListener('mouseenter', () => {
+        gsap.to(icon, { scale: 1.18, duration: 0.3, ease: 'back.out(3)' });
+      });
+      item.addEventListener('mouseleave', () => {
+        gsap.to(icon, { scale: 1, duration: 0.3, ease: 'power2.out' });
+      });
+    });
+
+    // پارالاکس ملایم با حرکت موس
+    window.addEventListener('mousemove', (e) => {
+      const rect = ring.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+      const dx = (e.clientX - cx) / rect.width;
+      const dy = (e.clientY - cy) / rect.height;
+      gsap.to(ring, { x: dx * 14, y: dy * 14, duration: 0.6, ease: 'power2.out' });
+    });
+  }
+</script>

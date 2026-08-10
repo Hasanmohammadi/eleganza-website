@@ -11,6 +11,13 @@ interface Props {
 
 const { title, description = 'Coming soon', lang } = Astro.props;
 const dir = locales[lang].dir;
+
+// فقط فونت‌های لازم برای همون زبان لود می‌شن
+const fontUrls: Record<Locale, string> = {
+  en: 'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600&display=swap',
+  fa: 'https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700&display=swap',
+  ar: 'https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@400;500&display=swap',
+};
 ---
 
 <!doctype html>
@@ -20,6 +27,9 @@ const dir = locales[lang].dir;
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content={description} />
     <title>{title}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href={fontUrls[lang]} />
   </head>
   <body class="antialiased">
     <slot />

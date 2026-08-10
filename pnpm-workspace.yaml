@@ -1,8 +1,0 @@
-overrides:
-  update-browserslist-db: 1.2.3
-
-packageImportMethod: copy
-
-allowBuilds:
-  esbuild: true
-  sharp: true
