@@ -1,9 +1,7 @@
 overrides:
   update-browserslist-db: 1.2.3
 
-onlyBuiltDependencies:
-  - esbuild
-  - sharp
+packageImportMethod: copy
 
 allowBuilds:
   esbuild: true
