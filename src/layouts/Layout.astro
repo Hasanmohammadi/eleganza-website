@@ -1,15 +1,16 @@
 ---
 import '../styles/global.css';
+import Seo from '../components/Seo.astro';
 import type { Locale } from '../i18n/translations';
 import { locales } from '../i18n/translations';
 
 interface Props {
   title: string;
-  description?: string;
+  description: string;
   lang: Locale;
 }
 
-const { title, description = 'Coming soon', lang } = Astro.props;
+const { title, description, lang } = Astro.props;
 const dir = locales[lang].dir;
 
 // فقط فونت‌های لازم برای همون زبان لود می‌شن
@@ -25,8 +26,8 @@ const fontUrls: Record<Locale, string> = {
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content={description} />
     <title>{title}</title>
+    <Seo title={title} description={description} lang={lang} />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="stylesheet" href={fontUrls[lang]} />

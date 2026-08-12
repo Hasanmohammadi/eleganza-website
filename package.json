@@ -11,7 +11,8 @@
   },
   "dependencies": {
     "astro": "^4.16.0",
-    "gsap": "^3.12.5"
+    "gsap": "^3.12.5",
+    "@astrojs/sitemap": "^3.2.1"
   },
   "devDependencies": {
     "@astrojs/tailwind": "^5.1.2",

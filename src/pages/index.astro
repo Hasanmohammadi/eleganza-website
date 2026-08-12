@@ -1,6 +1,7 @@
 ---
-// این صفحه فقط یک ریدایرکت هوشمنده: بر اساس زبان مرورگر کاربر رو
-// به /en/ یا /fa/ یا /ar/ می‌فرسته. اگه زبان مرورگر پشتیبانی نشه، fa پیش‌فرضه.
+// این صفحه فقط یک ریدایرکته: بر اساس زبان مرورگر کاربر رو به /en/, /fa/ یا /ar/
+// می‌فرسته. به‌خاطر همین noindex شده — نسخه‌ی واقعی و قابل‌ایندکس هر زبان
+// همون صفحات جداگانه‌ن (که hreflang هم بهشون اشاره می‌کنه).
 ---
 
 <!doctype html>
@@ -8,7 +9,12 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Redirecting...</title>
+    <title>Eleganza United Business</title>
+    <meta name="robots" content="noindex, follow" />
+    <link rel="alternate" hreflang="en" href="https://eleganzaco.com/en/" />
+    <link rel="alternate" hreflang="fa" href="https://eleganzaco.com/fa/" />
+    <link rel="alternate" hreflang="ar" href="https://eleganzaco.com/ar/" />
+    <link rel="alternate" hreflang="x-default" href="https://eleganzaco.com/" />
     <script>
       const supported = ['en', 'fa', 'ar'];
       const browserLang = navigator.language.slice(0, 2);
@@ -20,8 +26,8 @@
     </noscript>
   </head>
   <body>
-    <p style="font-family: sans-serif; padding: 2rem; text-align: center;">
-      Redirecting… <a href="/fa/">Click here</a> if you are not redirected automatically.
+    <p style="font-family: sans-serif; padding: 2rem; text-align: center; background:#0D0D0D; color:#F7F6F2;">
+      Redirecting… <a href="/fa/" style="color:#D4AF37;">Click here</a> if you are not redirected automatically.
     </p>
   </body>
 </html>
