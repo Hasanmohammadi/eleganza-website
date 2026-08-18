@@ -20,8 +20,8 @@ const icons = [
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-10">
     {h.whyChoose.features.map((f, i) => (
       <div class="feature-item flex flex-col items-center text-center gap-3 px-4">
-        <span class="text-gold">
-          <svg viewBox="0 0 24 24" class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" set:html={icons[i]} />
+        <span class="feature-icon inline-flex items-center justify-center w-14 h-14 rounded-full border border-gold/25 text-gold transition-all duration-300">
+          <svg viewBox="0 0 24 24" class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" set:html={icons[i]} />
         </span>
         <h3 class="font-display text-base md:text-lg text-warmwhite">{f.title}</h3>
         <p class="text-sm text-platinum leading-relaxed max-w-xs">{f.description}</p>
@@ -29,3 +29,11 @@ const icons = [
     ))}
   </div>
 </section>
+
+<style>
+  .feature-item:hover .feature-icon {
+    transform: scale(1.12) rotate(-6deg);
+    border-color: rgba(212, 175, 55, 0.7);
+    background: rgba(212, 175, 55, 0.08);
+  }
+</style>

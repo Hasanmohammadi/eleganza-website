@@ -12,7 +12,8 @@
 }
 
 html {
-  scroll-behavior: smooth;
+  /* اسکرول نرم رو Lenis (در Layout.astro) مدیریت می‌کنه؛ اینجا تنظیمش نمی‌کنیم
+     تا با هم تداخل نکنن. */
 }
 
 body {

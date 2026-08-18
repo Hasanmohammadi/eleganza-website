@@ -31,7 +31,7 @@ const pillarIcons = [
   <div class="particles pointer-events-none absolute inset-0 -z-10 overflow-hidden"></div>
 
   <header class="w-full flex justify-between items-center px-6 md:px-12 py-6 md:py-8">
-    <div class="emblem-wrap opacity-0">
+    <div class="emblem-wrap opacity-0" transition:name="brand-emblem">
       <EmblemMark class="w-8 h-8 md:w-9 md:h-9" />
     </div>
     <div class="lang-wrap opacity-0">
@@ -176,103 +176,114 @@ const pillarIcons = [
 <script>
   import gsap from 'gsap';
 
-  const tl = gsap.timeline({ defaults: { ease: 'power3.out', duration: 0.9 } });
+  function initComingSoon() {
+    const root = document.querySelector('.cs-badge');
+    if (!root) return; // یعنی الان تو صفحه‌ی دیگه‌ای هستیم
 
-  tl.fromTo('.emblem-wrap', { opacity: 0, y: -16, rotate: -15 }, { opacity: 1, y: 0, rotate: 0, duration: 0.8, ease: 'back.out(2)' })
-    .fromTo('.lang-wrap', { opacity: 0, y: -10 }, { opacity: 1, y: 0 }, '<0.1')
-    .fromTo('.cs-badge', { opacity: 0, y: 14, scale: 0.8 }, { opacity: 1, y: 0, scale: 1, ease: 'back.out(2.5)' }, '-=0.3')
-    .fromTo('.cs-brand', { opacity: 0, y: 30, scale: 0.92 }, { opacity: 1, y: 0, scale: 1, duration: 1.1 }, '-=0.4')
-    .fromTo('.cs-headline', { opacity: 0, y: 22 }, { opacity: 1, y: 0 }, '-=0.7')
-    .fromTo('.cs-subtitle', { opacity: 0, y: 18 }, { opacity: 1, y: 0 }, '-=0.6')
-    .fromTo('.cs-ring', { opacity: 0, scale: 0.85 }, { opacity: 1, scale: 1, duration: 1 }, '-=0.4')
-    .fromTo('.countdown-box', { opacity: 0, y: 20, rotateX: -40 }, { opacity: 1, y: 0, rotateX: 0, stagger: 0.1, ease: 'back.out(2)' }, '-=0.5')
-    .to('.cs-countdown', { opacity: 1, duration: 0.3 }, '<')
-    .fromTo('.cs-form', { opacity: 0, y: 18 }, { opacity: 1, y: 0 }, '-=0.3')
-    .fromTo('.pillar-item', { opacity: 0, y: 24, scale: 0.85 }, { opacity: 1, y: 0, scale: 1, stagger: 0.15, ease: 'back.out(2)' }, '-=0.2')
-    .to('.cs-pillars', { opacity: 1, duration: 0.3 }, '<')
-    .fromTo('.cs-footer', { opacity: 0 }, { opacity: 1, duration: 0.6 }, '-=0.2');
+    const tl = gsap.timeline({ defaults: { ease: 'power3.out', duration: 0.9 } });
 
-  gsap.to('.brand-title', { backgroundPosition: '250% center', duration: 6, repeat: -1, ease: 'none' });
-  gsap.to('.emblem-wrap', { y: -6, duration: 2.6, repeat: -1, yoyo: true, ease: 'sine.inOut', delay: 1.5 });
-  gsap.to('.cs-badge', { scale: 1.05, duration: 1.8, repeat: -1, yoyo: true, ease: 'sine.inOut', delay: 1.5 });
+    tl.fromTo('.emblem-wrap', { opacity: 0, y: -16, rotate: -15 }, { opacity: 1, y: 0, rotate: 0, duration: 0.8, ease: 'back.out(2)' })
+      .fromTo('.lang-wrap', { opacity: 0, y: -10 }, { opacity: 1, y: 0 }, '<0.1')
+      .fromTo('.cs-badge', { opacity: 0, y: 14, scale: 0.8 }, { opacity: 1, y: 0, scale: 1, ease: 'back.out(2.5)' }, '-=0.3')
+      .fromTo('.cs-brand', { opacity: 0, y: 30, scale: 0.92 }, { opacity: 1, y: 0, scale: 1, duration: 1.1 }, '-=0.4')
+      .fromTo('.cs-headline', { opacity: 0, y: 22 }, { opacity: 1, y: 0 }, '-=0.7')
+      .fromTo('.cs-subtitle', { opacity: 0, y: 18 }, { opacity: 1, y: 0 }, '-=0.6')
+      .fromTo('.cs-ring', { opacity: 0, scale: 0.85 }, { opacity: 1, scale: 1, duration: 1 }, '-=0.4')
+      .fromTo('.countdown-box', { opacity: 0, y: 20, rotateX: -40 }, { opacity: 1, y: 0, rotateX: 0, stagger: 0.1, ease: 'back.out(2)' }, '-=0.5')
+      .to('.cs-countdown', { opacity: 1, duration: 0.3 }, '<')
+      .fromTo('.cs-form', { opacity: 0, y: 18 }, { opacity: 1, y: 0 }, '-=0.3')
+      .fromTo('.pillar-item', { opacity: 0, y: 24, scale: 0.85 }, { opacity: 1, y: 0, scale: 1, stagger: 0.15, ease: 'back.out(2)' }, '-=0.2')
+      .to('.cs-pillars', { opacity: 1, duration: 0.3 }, '<')
+      .fromTo('.cs-footer', { opacity: 0 }, { opacity: 1, duration: 0.6 }, '-=0.2');
 
-  gsap.utils.toArray('.pillar-icon').forEach((icon: any, i: number) => {
-    gsap.to(icon, {
-      rotate: 8,
-      duration: 2.2,
-      repeat: -1,
-      yoyo: true,
-      ease: 'sine.inOut',
-      delay: 2 + i * 0.3,
-    });
-  });
+    gsap.to('.brand-title', { backgroundPosition: '250% center', duration: 6, repeat: -1, ease: 'none' });
+    gsap.to('.emblem-wrap', { y: -6, duration: 2.6, repeat: -1, yoyo: true, ease: 'sine.inOut', delay: 1.5 });
+    gsap.to('.cs-badge', { scale: 1.05, duration: 1.8, repeat: -1, yoyo: true, ease: 'sine.inOut', delay: 1.5 });
 
-  const particleContainer = document.querySelector('.particles');
-  if (particleContainer) {
-    const count = window.innerWidth < 640 ? 14 : 26;
-    for (let i = 0; i < count; i++) {
-      const p = document.createElement('div');
-      const size = Math.random() * 3 + 1.5;
-      p.style.position = 'absolute';
-      p.style.width = `${size}px`;
-      p.style.height = `${size}px`;
-      p.style.borderRadius = '9999px';
-      p.style.background = Math.random() > 0.5 ? '#D4AF37' : '#F3E6B3';
-      p.style.opacity = `${Math.random() * 0.4 + 0.15}`;
-      p.style.left = `${Math.random() * 100}%`;
-      p.style.top = `${Math.random() * 100}%`;
-      particleContainer.appendChild(p);
-
-      gsap.to(p, {
-        y: `-=${Math.random() * 120 + 60}`,
-        x: `+=${(Math.random() - 0.5) * 60}`,
-        opacity: 0,
-        duration: Math.random() * 6 + 6,
+    gsap.utils.toArray('.pillar-icon').forEach((icon: any, i: number) => {
+      gsap.to(icon, {
+        rotate: 8,
+        duration: 2.2,
         repeat: -1,
-        delay: Math.random() * 6,
+        yoyo: true,
         ease: 'sine.inOut',
+        delay: 2 + i * 0.3,
       });
+    });
+
+    const particleContainer = document.querySelector('.particles');
+    if (particleContainer) {
+      particleContainer.innerHTML = ''; // پاکسازی احتیاطی قبل از ساخت دوباره
+      const count = window.innerWidth < 640 ? 14 : 26;
+      for (let i = 0; i < count; i++) {
+        const p = document.createElement('div');
+        const size = Math.random() * 3 + 1.5;
+        p.style.position = 'absolute';
+        p.style.width = `${size}px`;
+        p.style.height = `${size}px`;
+        p.style.borderRadius = '9999px';
+        p.style.background = Math.random() > 0.5 ? '#D4AF37' : '#F3E6B3';
+        p.style.opacity = `${Math.random() * 0.4 + 0.15}`;
+        p.style.left = `${Math.random() * 100}%`;
+        p.style.top = `${Math.random() * 100}%`;
+        particleContainer.appendChild(p);
+
+        gsap.to(p, {
+          y: `-=${Math.random() * 120 + 60}`,
+          x: `+=${(Math.random() - 0.5) * 60}`,
+          opacity: 0,
+          duration: Math.random() * 6 + 6,
+          repeat: -1,
+          delay: Math.random() * 6,
+          ease: 'sine.inOut',
+        });
+      }
     }
-  }
 
-  const target = new Date();
-  target.setDate(target.getDate() + 30);
+    const target = new Date();
+    target.setDate(target.getDate() + 30);
 
-  const daysEl = document.querySelector('[data-unit="days"]') as HTMLElement;
-  const hoursEl = document.querySelector('[data-unit="hours"]') as HTMLElement;
-  const minutesEl = document.querySelector('[data-unit="minutes"]') as HTMLElement;
-  const secondsEl = document.querySelector('[data-unit="seconds"]') as HTMLElement;
+    const daysEl = document.querySelector('[data-unit="days"]') as HTMLElement;
+    const hoursEl = document.querySelector('[data-unit="hours"]') as HTMLElement;
+    const minutesEl = document.querySelector('[data-unit="minutes"]') as HTMLElement;
+    const secondsEl = document.querySelector('[data-unit="seconds"]') as HTMLElement;
 
-  function pad(n: number): string {
-    return n.toString().padStart(2, '0');
-  }
-
-  function popIfChanged(el: HTMLElement | null, value: string) {
-    if (!el || el.textContent === value) return;
-    el.textContent = value;
-    gsap.fromTo(el, { scale: 1.35, color: '#F7F6F2' }, { scale: 1, color: '#F3E6B3', duration: 0.4, ease: 'back.out(3)' });
-  }
-
-  function tick(): void {
-    const diff = Math.max(0, target.getTime() - Date.now());
-    popIfChanged(daysEl, pad(Math.floor(diff / (1000 * 60 * 60 * 24))));
-    popIfChanged(hoursEl, pad(Math.floor((diff / (1000 * 60 * 60)) % 24)));
-    popIfChanged(minutesEl, pad(Math.floor((diff / (1000 * 60)) % 60)));
-    popIfChanged(secondsEl, pad(Math.floor((diff / 1000) % 60)));
-  }
-
-  tick();
-  setInterval(tick, 1000);
-
-  const form = document.getElementById('notify-form') as HTMLFormElement | null;
-  const successMsg = document.querySelector('.cs-success') as HTMLElement | null;
-
-  form?.addEventListener('submit', (e: SubmitEvent) => {
-    e.preventDefault();
-    form.reset();
-    if (successMsg) {
-      successMsg.classList.remove('hidden');
-      gsap.fromTo(successMsg, { opacity: 0, y: 6 }, { opacity: 1, y: 0, duration: 0.4 });
+    function pad(n: number): string {
+      return n.toString().padStart(2, '0');
     }
-  });
+
+    function popIfChanged(el: HTMLElement | null, value: string) {
+      if (!el || el.textContent === value) return;
+      el.textContent = value;
+      gsap.fromTo(el, { scale: 1.35, color: '#F7F6F2' }, { scale: 1, color: '#F3E6B3', duration: 0.4, ease: 'back.out(3)' });
+    }
+
+    function tick(): void {
+      const diff = Math.max(0, target.getTime() - Date.now());
+      popIfChanged(daysEl, pad(Math.floor(diff / (1000 * 60 * 60 * 24))));
+      popIfChanged(hoursEl, pad(Math.floor((diff / (1000 * 60 * 60)) % 24)));
+      popIfChanged(minutesEl, pad(Math.floor((diff / (1000 * 60)) % 60)));
+      popIfChanged(secondsEl, pad(Math.floor((diff / 1000) % 60)));
+    }
+
+    tick();
+    const intervalId = window.setInterval(tick, 1000);
+
+    // پاک‌سازی موقع خروج از صفحه (جلوگیری از تایمرهای تکراری با View Transitions)
+    document.addEventListener('astro:before-swap', () => window.clearInterval(intervalId), { once: true });
+
+    const form = document.getElementById('notify-form') as HTMLFormElement | null;
+    const successMsg = document.querySelector('.cs-success') as HTMLElement | null;
+
+    form?.addEventListener('submit', (e: SubmitEvent) => {
+      e.preventDefault();
+      form.reset();
+      if (successMsg) {
+        successMsg.classList.remove('hidden');
+        gsap.fromTo(successMsg, { opacity: 0, y: 6 }, { opacity: 1, y: 0, duration: 0.4 });
+      }
+    });
+  }
+
+  document.addEventListener('astro:page-load', initComingSoon);
 </script>

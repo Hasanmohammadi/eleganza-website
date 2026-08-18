@@ -1,6 +1,7 @@
 ---
 import '../styles/global.css';
 import Seo from '../components/Seo.astro';
+import { ViewTransitions } from 'astro:transitions';
 import type { Locale } from '../i18n/translations';
 import { locales } from '../i18n/translations';
 
@@ -32,8 +33,72 @@ const fontUrls: Record<Locale, string> = {
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="stylesheet" href={fontUrls[lang]} />
+    <!-- انتقال نرم بین صفحات (native Astro، بدون نیاز به React Router) -->
+    <ViewTransitions />
   </head>
   <body class="antialiased">
     <slot />
   </body>
 </html>
+
+<script>
+  // ---------- اسکرول نرم سراسری (Lenis) + همگام‌سازی با GSAP ScrollTrigger ----------
+  // astro:page-load هم موقع لود اول صفحه اجرا می‌شه هم بعد از هر View Transition،
+  // پس فقط همینو لازم داریم (نه یه فراخوانی مستقیم جدا).
+  async function initSmoothScroll() {
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // @ts-ignore — قبل از هر چیز، نمونه‌ی قبلی (اگه از ناوبری قبلی مونده) رو تمیز می‌کنیم
+    if (window.__lenis) {
+      // @ts-ignore
+      window.__lenis.destroy();
+      // @ts-ignore
+      window.__lenisTick && gsapCache?.ticker.remove(window.__lenisTick);
+      // @ts-ignore
+      window.__lenis = null;
+    }
+
+    if (prefersReduced) return; // برای کاربرانی که انیمیشن کمتر می‌خوان، اسکرول نیتیو می‌مونه
+
+    const [{ default: Lenis }, gsapModule, stModule] = await Promise.all([
+      import('lenis'),
+      import('gsap'),
+      import('gsap/ScrollTrigger'),
+    ]);
+    const gsap = gsapModule.default;
+    const { ScrollTrigger } = stModule;
+    gsap.registerPlugin(ScrollTrigger);
+    gsapCache = gsap;
+
+    const lenis = new Lenis({
+      duration: 1.1,
+      easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      smoothWheel: true,
+    });
+
+    lenis.on('scroll', ScrollTrigger.update);
+    const tick = (time: number) => lenis.raf(time * 1000);
+    gsap.ticker.add(tick);
+    gsap.ticker.lagSmoothing(0);
+
+    // @ts-ignore — در دسترس بودن برای اسکریپت‌های دیگه‌ی همون صفحه و برای cleanup بعدی
+    window.__lenis = lenis;
+    // @ts-ignore
+    window.__lenisTick = tick;
+  }
+
+  let gsapCache: typeof import('gsap').default | null = null;
+  document.addEventListener('astro:page-load', initSmoothScroll);
+
+  // پاک‌سازی مرکزی: قبل از هر جابجایی صفحه (View Transition)، تمام
+  // ScrollTrigger های صفحه‌ی قبلی رو می‌کشیم تا صفحه‌ی بعدی از صفر و تمیز
+  // انیمیشن‌هاش رو دوباره بسازه (وگرنه عناصر ممکنه تو حالت مخفی گیر کنن).
+  document.addEventListener('astro:before-swap', async () => {
+    try {
+      const { ScrollTrigger } = await import('gsap/ScrollTrigger');
+      ScrollTrigger.getAll().forEach((st) => st.kill());
+    } catch {
+      // اگه هنوز gsap لود نشده بود، چیزی برای پاک‌کردن نیست
+    }
+  });
+</script>

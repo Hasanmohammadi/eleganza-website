@@ -8,9 +8,11 @@ const { h } = Astro.props;
 ---
 
 <section class="hero-section relative min-h-[92vh] flex items-end overflow-hidden">
-  <div class="absolute inset-0 -z-10">
-    <img src="/mock/hero-bg.jpg" alt="" class="w-full h-full object-cover" />
+  <div class="hero-bg-wrap absolute inset-0 -z-10">
+    <img src="/mock/hero-bg.jpg" alt="" class="hero-bg-img w-full h-full object-cover" />
     <div class="absolute inset-0" style="background: linear-gradient(180deg, rgba(13,13,13,0.35) 0%, rgba(13,13,13,0.55) 55%, #0D0D0D 100%);"></div>
+    <!-- بوم Three.js — ذرات ظریف طلایی/پلاتینیوم در عمق سه‌بعدی -->
+    <canvas class="hero-particles absolute inset-0 w-full h-full" aria-hidden="true"></canvas>
   </div>
 
   <div class="max-w-7xl mx-auto px-6 md:px-10 pb-16 md:pb-24 pt-40 w-full">
@@ -27,11 +29,11 @@ const { h } = Astro.props;
       {h.hero.subtitle}
     </p>
     <div class="hero-ctas opacity-0 mt-9 flex flex-col sm:flex-row gap-4">
-      <a href="#industries" class="px-7 py-3.5 text-sm font-medium tracking-wide text-charcoal text-center" style="background: linear-gradient(135deg, #F3E6B3, #D4AF37);">
-        {h.hero.ctaPrimary}
+      <a href="#industries" class="magnetic-btn px-7 py-3.5 text-sm font-medium tracking-wide text-charcoal text-center" style="background: linear-gradient(135deg, #F3E6B3, #D4AF37);">
+        <span class="magnetic-btn-inner inline-block">{h.hero.ctaPrimary}</span>
       </a>
-      <a href="#about" class="px-7 py-3.5 text-sm font-medium tracking-wide text-warmwhite border border-platinum/30 hover:border-gold/60 transition-colors text-center">
-        {h.hero.ctaSecondary}
+      <a href="#about" class="magnetic-btn px-7 py-3.5 text-sm font-medium tracking-wide text-warmwhite border border-platinum/30 hover:border-gold/60 transition-colors text-center">
+        <span class="magnetic-btn-inner inline-block">{h.hero.ctaSecondary}</span>
       </a>
     </div>
   </div>
@@ -39,9 +41,150 @@ const { h } = Astro.props;
 
 <script>
   import gsap from 'gsap';
-  gsap.timeline({ defaults: { ease: 'power3.out', duration: 1 }, delay: 0.2 })
-    .fromTo('.hero-eyebrow', { opacity: 0, y: 16 }, { opacity: 1, y: 0 })
-    .fromTo('.hero-title', { opacity: 0, y: 30 }, { opacity: 1, y: 0 }, '-=0.6')
-    .fromTo('.hero-subtitle', { opacity: 0, y: 20 }, { opacity: 1, y: 0 }, '-=0.7')
-    .fromTo('.hero-ctas', { opacity: 0, y: 20 }, { opacity: 1, y: 0 }, '-=0.6');
+
+  function initHero() {
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const heroSection = document.querySelector('.hero-section');
+    if (!heroSection) return; // این صفحه هیرو نداره (مثلاً صفحه‌ی Coming Soon)
+
+    // ---------- تایم‌لاین ورود ----------
+    gsap.timeline({ defaults: { ease: 'power3.out', duration: 1 }, delay: 0.2 })
+      .fromTo('.hero-eyebrow', { opacity: 0, y: 16 }, { opacity: 1, y: 0 })
+      .fromTo('.hero-title', { opacity: 0, y: 30 }, { opacity: 1, y: 0 }, '-=0.6')
+      .fromTo('.hero-subtitle', { opacity: 0, y: 20 }, { opacity: 1, y: 0 }, '-=0.7')
+      .fromTo('.hero-ctas', { opacity: 0, y: 20 }, { opacity: 1, y: 0 }, '-=0.6');
+
+    // ---------- پارالاکس تصویر پس‌زمینه موقع اسکرول ----------
+    if (!prefersReduced) {
+      import('gsap/ScrollTrigger').then(({ ScrollTrigger }) => {
+        gsap.registerPlugin(ScrollTrigger);
+        const heroImg = document.querySelector('.hero-bg-img');
+        if (heroImg) {
+          gsap.fromTo(
+            heroImg,
+            { yPercent: 0, scale: 1 },
+            {
+              yPercent: 18,
+              scale: 1.12,
+              ease: 'none',
+              scrollTrigger: { trigger: heroSection, start: 'top top', end: 'bottom top', scrub: true },
+            }
+          );
+        }
+      });
+    }
+
+    // ---------- دکمه‌های مگنتیک ----------
+    if (!prefersReduced && window.matchMedia('(hover: hover)').matches) {
+      document.querySelectorAll<HTMLElement>('.magnetic-btn').forEach((btn) => {
+        const inner = btn.querySelector<HTMLElement>('.magnetic-btn-inner');
+        const xTo = gsap.quickTo(btn, 'x', { duration: 0.5, ease: 'power3.out' });
+        const yTo = gsap.quickTo(btn, 'y', { duration: 0.5, ease: 'power3.out' });
+        const xToInner = inner ? gsap.quickTo(inner, 'x', { duration: 0.5, ease: 'power3.out' }) : null;
+        const yToInner = inner ? gsap.quickTo(inner, 'y', { duration: 0.5, ease: 'power3.out' }) : null;
+
+        btn.addEventListener('mousemove', (e) => {
+          const rect = btn.getBoundingClientRect();
+          const relX = e.clientX - rect.left - rect.width / 2;
+          const relY = e.clientY - rect.top - rect.height / 2;
+          xTo(relX * 0.25);
+          yTo(relY * 0.4);
+          xToInner?.(relX * 0.12);
+          yToInner?.(relY * 0.18);
+        });
+        btn.addEventListener('mouseleave', () => {
+          xTo(0);
+          yTo(0);
+          xToInner?.(0);
+          yToInner?.(0);
+        });
+      });
+    }
+
+    // ---------- بوم ذرات سه‌بعدی (Three.js) ----------
+    if (!prefersReduced) {
+      import('three').then((THREE) => {
+        const canvas = document.querySelector('.hero-particles') as HTMLCanvasElement | null;
+        const wrap = document.querySelector('.hero-bg-wrap') as HTMLElement | null;
+        if (!canvas || !wrap) return;
+
+        const isSmall = window.innerWidth < 768;
+        const particleCount = isSmall ? 90 : 220;
+
+        const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: false });
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 100);
+        camera.position.z = 14;
+
+        const positions = new Float32Array(particleCount * 3);
+        for (let i = 0; i < particleCount; i++) {
+          positions[i * 3] = (Math.random() - 0.5) * 22;
+          positions[i * 3 + 1] = (Math.random() - 0.5) * 12;
+          positions[i * 3 + 2] = (Math.random() - 0.5) * 14;
+        }
+        const geometry = new THREE.BufferGeometry();
+        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+
+        const material = new THREE.PointsMaterial({
+          color: 0xd4af37,
+          size: 0.045,
+          transparent: true,
+          opacity: 0.55,
+          sizeAttenuation: true,
+        });
+        const points = new THREE.Points(geometry, material);
+        scene.add(points);
+
+        let mouseX = 0;
+        let mouseY = 0;
+        const onMouseMove = (e: MouseEvent) => {
+          mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
+          mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
+        };
+        window.addEventListener('mousemove', onMouseMove);
+
+        function resize() {
+          if (!canvas || !wrap) return;
+          const w = wrap.clientWidth;
+          const hgt = wrap.clientHeight;
+          renderer.setSize(w, hgt, false);
+          camera.aspect = w / hgt;
+          camera.updateProjectionMatrix();
+        }
+        resize();
+        window.addEventListener('resize', resize);
+
+        let rafId: number;
+        const clock = new THREE.Clock();
+        function animate() {
+          rafId = requestAnimationFrame(animate);
+          const t = clock.getElapsedTime();
+          points.rotation.y = t * 0.015;
+          camera.position.x += (mouseX * 0.6 - camera.position.x) * 0.03;
+          camera.position.y += (-mouseY * 0.4 - camera.position.y) * 0.03;
+          camera.lookAt(0, 0, 0);
+          renderer.render(scene, camera);
+        }
+        animate();
+
+        // پاک‌سازی کامل موقع خروج از صفحه (جلوگیری از نشتی حافظه با View Transitions)
+        document.addEventListener(
+          'astro:before-swap',
+          () => {
+            cancelAnimationFrame(rafId);
+            window.removeEventListener('mousemove', onMouseMove);
+            window.removeEventListener('resize', resize);
+            geometry.dispose();
+            material.dispose();
+            renderer.dispose();
+          },
+          { once: true }
+        );
+      });
+    }
+  }
+
+  document.addEventListener('astro:page-load', initHero);
 </script>

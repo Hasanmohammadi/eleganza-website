@@ -77,8 +77,10 @@ const positions = industries.map((industry, i) => {
 <script>
   import gsap from 'gsap';
 
-  const ring = document.querySelector('.industry-ring') as HTMLElement | null;
-  if (ring) {
+  function initIndustryRing() {
+    const ring = document.querySelector('.industry-ring') as HTMLElement | null;
+    if (!ring) return;
+
     const outer = ring.querySelector('.ring-outer');
     const inner = ring.querySelector('.ring-inner');
     const glow = ring.querySelector('.ring-glow');
@@ -114,13 +116,19 @@ const positions = industries.map((industry, i) => {
     });
 
     // پارالاکس ملایم با حرکت موس
-    window.addEventListener('mousemove', (e) => {
+    const onMouseMove = (e: MouseEvent) => {
       const rect = ring.getBoundingClientRect();
       const cx = rect.left + rect.width / 2;
       const cy = rect.top + rect.height / 2;
       const dx = (e.clientX - cx) / rect.width;
       const dy = (e.clientY - cy) / rect.height;
       gsap.to(ring, { x: dx * 14, y: dy * 14, duration: 0.6, ease: 'power2.out' });
-    });
+    };
+    window.addEventListener('mousemove', onMouseMove);
+
+    // پاک‌سازی لیسنر موقع خروج از صفحه
+    document.addEventListener('astro:before-swap', () => window.removeEventListener('mousemove', onMouseMove), { once: true });
   }
+
+  document.addEventListener('astro:page-load', initIndustryRing);
 </script>

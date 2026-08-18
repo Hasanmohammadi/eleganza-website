@@ -14,7 +14,7 @@ const langs = Object.keys(locales) as Locale[];
 
 <header class="site-header fixed top-0 inset-x-0 z-50 border-b border-platinum/10 backdrop-blur-md">
   <div class="max-w-7xl mx-auto px-6 md:px-10 h-16 md:h-20 flex items-center justify-between">
-    <a href={`/${lang}/`} class="flex items-center gap-2.5 shrink-0">
+    <a href={`/${lang}/`} class="flex items-center gap-2.5 shrink-0" transition:name="brand-emblem">
       <EmblemMark class="w-7 h-7 md:w-8 md:h-8" />
       <span class="hidden sm:block font-display text-sm md:text-base tracking-widest2 uppercase text-warmwhite">
         Eleganza
@@ -81,12 +81,32 @@ const langs = Object.keys(locales) as Locale[];
 
 <style>
   .site-header {
-    background-color: rgba(13, 13, 13, 0.72);
+    background-color: rgba(13, 13, 13, 0.5);
+    transition: background-color 0.4s ease, box-shadow 0.4s ease, border-color 0.4s ease;
+  }
+  .site-header.is-scrolled {
+    background-color: rgba(13, 13, 13, 0.88);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+    border-color: rgba(212, 175, 55, 0.15);
   }
 </style>
 
 <script>
-  const btn = document.getElementById('mobile-menu-btn');
-  const menu = document.getElementById('mobile-menu');
-  btn?.addEventListener('click', () => menu?.classList.toggle('hidden'));
+  function initHeader() {
+    const btn = document.getElementById('mobile-menu-btn');
+    const menu = document.getElementById('mobile-menu');
+    btn?.addEventListener('click', () => menu?.classList.toggle('hidden'));
+
+    // بعد از عبور از هیرو، هدر کمی تیره‌تر و با سایه می‌شه
+    const header = document.querySelector('.site-header');
+    if (!header) return;
+    function updateHeaderState() {
+      if (window.scrollY > 60) header!.classList.add('is-scrolled');
+      else header!.classList.remove('is-scrolled');
+    }
+    updateHeaderState();
+    window.addEventListener('scroll', updateHeaderState, { passive: true });
+  }
+
+  document.addEventListener('astro:page-load', initHeader);
 </script>
