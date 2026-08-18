@@ -8,9 +8,10 @@ interface Props {
   title: string;
   description: string;
   lang: Locale;
+  noindex?: boolean;
 }
 
-const { title, description, lang } = Astro.props;
+const { title, description, lang, noindex = false } = Astro.props;
 const dir = locales[lang].dir;
 
 // فقط فونت‌های لازم برای همون زبان لود می‌شن
@@ -27,7 +28,7 @@ const fontUrls: Record<Locale, string> = {
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{title}</title>
-    <Seo title={title} description={description} lang={lang} />
+    <Seo title={title} description={description} lang={lang} noindex={noindex} />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="stylesheet" href={fontUrls[lang]} />

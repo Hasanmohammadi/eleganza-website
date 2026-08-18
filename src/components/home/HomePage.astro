@@ -1,0 +1,79 @@
+---
+import Header from './Header.astro';
+import Hero from './Hero.astro';
+import StatsBar from './StatsBar.astro';
+import Intro from './Intro.astro';
+import ExploreGrid from './ExploreGrid.astro';
+import IndustriesSection from './IndustriesSection.astro';
+import WhyChoose from './WhyChoose.astro';
+import ProcessSteps from './ProcessSteps.astro';
+import NewsSection from './NewsSection.astro';
+import EventsSection from './EventsSection.astro';
+import Footer from './Footer.astro';
+import type { Locale } from '../../i18n/translations';
+import type { HomeContent } from '../../i18n/home';
+
+interface Props {
+  lang: Locale;
+  h: HomeContent;
+}
+const { lang, h } = Astro.props;
+---
+
+<div class="bg-charcoal">
+  <Header lang={lang} h={h} />
+  <Hero h={h} />
+  <StatsBar h={h} />
+  <Intro h={h} />
+  <ExploreGrid h={h} />
+  <IndustriesSection h={h} />
+  <WhyChoose h={h} />
+  <ProcessSteps h={h} />
+  <NewsSection h={h} />
+  <EventsSection h={h} />
+  <Footer lang={lang} h={h} />
+</div>
+
+<script>
+  import gsap from 'gsap';
+  import { ScrollTrigger } from 'gsap/ScrollTrigger';
+  gsap.registerPlugin(ScrollTrigger);
+
+  // برای هر سکشن، فرزندهای مستقیمی که کارت/آیتم هستن رو موقع رسیدن به دید انیمیت می‌کنیم
+  const itemSelectors = '.stat-item, .explore-card, .industry-card, .feature-item, .step-item, .news-card, .event-card';
+
+  document.querySelectorAll('.reveal-section').forEach((section) => {
+    const items = section.querySelectorAll(itemSelectors);
+    const heading = section.querySelector('h2');
+
+    if (heading) {
+      gsap.fromTo(
+        heading,
+        { opacity: 0, y: 24 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.8,
+          ease: 'power3.out',
+          scrollTrigger: { trigger: section, start: 'top 82%' },
+        }
+      );
+    }
+
+    if (items.length) {
+      gsap.fromTo(
+        items,
+        { opacity: 0, y: 28, scale: 0.96 },
+        {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          duration: 0.7,
+          stagger: 0.08,
+          ease: 'back.out(1.7)',
+          scrollTrigger: { trigger: section, start: 'top 78%' },
+        }
+      );
+    }
+  });
+</script>

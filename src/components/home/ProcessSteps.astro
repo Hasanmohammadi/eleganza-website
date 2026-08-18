@@ -1,0 +1,27 @@
+---
+import type { HomeContent } from '../../i18n/home';
+interface Props { h: HomeContent }
+const { h } = Astro.props;
+---
+
+<section id="contact" class="reveal-section bg-navy/20 border-y border-platinum/10">
+  <div class="max-w-7xl mx-auto px-6 md:px-10 py-16 md:py-24">
+    <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-12 md:mb-16">
+      <h2 class="font-display text-2xl sm:text-3xl md:text-4xl text-warmwhite max-w-xl">
+        {h.process.sectionTitle}
+      </h2>
+      <a href="mailto:hello@eleganzaco.com" class="shrink-0 px-6 py-3 text-sm font-medium tracking-wide text-charcoal text-center" style="background: linear-gradient(135deg, #F3E6B3, #D4AF37);">
+        {h.process.cta}
+      </a>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-6">
+      {h.process.steps.map((step) => (
+        <div class="step-item relative pt-8 border-t border-gold/30">
+          <span class="font-display text-4xl md:text-5xl text-gold/40">{step.number}</span>
+          <h3 class="font-display text-lg md:text-xl text-warmwhite mt-4 mb-2">{step.title}</h3>
+          <p class="text-sm text-platinum leading-relaxed">{step.description}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>

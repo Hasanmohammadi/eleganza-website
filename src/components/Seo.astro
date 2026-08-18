@@ -5,9 +5,10 @@ interface Props {
   title: string;
   description: string;
   lang: Locale;
+  noindex?: boolean;
 }
 
-const { title, description, lang } = Astro.props;
+const { title, description, lang, noindex = false } = Astro.props;
 
 const siteUrl = Astro.site ?? new URL('https://eleganzaco.com/');
 const canonicalUrl = new URL(`${lang}/`, siteUrl).toString();
@@ -39,7 +40,7 @@ const websiteJsonLd = {
 <!-- Primary -->
 <meta name="description" content={description} />
 <link rel="canonical" href={canonicalUrl} />
-<meta name="robots" content="index, follow" />
+<meta name="robots" content={noindex ? 'noindex, nofollow' : 'index, follow'} />
 <meta name="theme-color" content="#0D0D0D" />
 <!-- بعد از ثبت سایت تو Google Search Console، کد تاییدیه رو اینجا بذار: -->
 <!-- <meta name="google-site-verification" content="YOUR_CODE_HERE" /> -->

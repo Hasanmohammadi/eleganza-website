@@ -1,0 +1,35 @@
+---
+import type { HomeContent } from '../../i18n/home';
+interface Props { h: HomeContent }
+const { h } = Astro.props;
+---
+
+<section id="events" class="reveal-section bg-navy/15 border-y border-platinum/10">
+  <div class="max-w-7xl mx-auto px-6 md:px-10 py-16 md:py-24">
+    <div class="flex items-center justify-between mb-10 md:mb-12">
+      <h2 class="font-display text-2xl sm:text-3xl md:text-4xl text-warmwhite">{h.events.sectionTitle}</h2>
+      <a href="#" class="hidden sm:inline text-sm text-gold border-b border-gold/40 hover:border-gold pb-0.5 transition-colors whitespace-nowrap">
+        {h.events.viewAll} &rarr;
+      </a>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 md:gap-8">
+      {h.events.items.map((item) => (
+        <a href="#" class="event-card group block border border-platinum/10 overflow-hidden">
+          <div class="relative aspect-[3/2] overflow-hidden">
+            <img src={item.image} alt="" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+            <span class="absolute top-3 px-2.5 py-1 text-[10px] tracking-wide uppercase bg-charcoal/80 text-gold-light border border-gold/30" style="inset-inline-start: 0.75rem;">
+              {item.tag}
+            </span>
+          </div>
+          <div class="p-4 md:p-5">
+            <span class="text-xs text-gold">{item.date}</span>
+            <h3 class="font-display text-base md:text-lg text-warmwhite mt-1.5 mb-1.5 leading-snug group-hover:text-gold-light transition-colors">
+              {item.title}
+            </h3>
+            <span class="text-xs text-platinum/70">{item.type}</span>
+          </div>
+        </a>
+      ))}
+    </div>
+  </div>
+</section>

@@ -1,0 +1,16 @@
+---
+import type { HomeContent } from '../../i18n/home';
+interface Props { h: HomeContent }
+const { h } = Astro.props;
+---
+
+<section class="reveal-section border-y border-platinum/10 bg-navy/20">
+  <div class="max-w-7xl mx-auto px-6 md:px-10 py-10 md:py-12 grid grid-cols-2 md:grid-cols-4 gap-8">
+    {h.stats.map((stat) => (
+      <div class="stat-item text-center md:text-start">
+        <div class="font-display text-3xl md:text-5xl text-gold-light">{stat.value}</div>
+        <div class="mt-1 text-xs md:text-sm text-platinum">{stat.label}</div>
+      </div>
+    ))}
+  </div>
+</section>

@@ -1,0 +1,14 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import HomePage from '../../../components/home/HomePage.astro';
+import { translations } from '../../../i18n/translations';
+import { homeContent } from '../../../i18n/home';
+
+const lang = 'ar' as const;
+const t = translations[lang];
+const h = homeContent[lang];
+---
+
+<Layout title="إليغانزا يونايتد بيزنس — معاينة" description={t.subtitle} lang={lang} noindex={true}>
+  <HomePage lang={lang} h={h} />
+</Layout>

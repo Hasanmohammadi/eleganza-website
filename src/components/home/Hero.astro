@@ -1,0 +1,47 @@
+---
+import type { HomeContent } from '../../i18n/home';
+
+interface Props {
+  h: HomeContent;
+}
+const { h } = Astro.props;
+---
+
+<section class="hero-section relative min-h-[92vh] flex items-end overflow-hidden">
+  <div class="absolute inset-0 -z-10">
+    <img src="/mock/hero-bg.jpg" alt="" class="w-full h-full object-cover" />
+    <div class="absolute inset-0" style="background: linear-gradient(180deg, rgba(13,13,13,0.35) 0%, rgba(13,13,13,0.55) 55%, #0D0D0D 100%);"></div>
+  </div>
+
+  <div class="max-w-7xl mx-auto px-6 md:px-10 pb-16 md:pb-24 pt-40 w-full">
+    <span class="hero-eyebrow opacity-0 inline-block mb-5 text-xs md:text-sm tracking-widest2 uppercase text-gold-light">
+      {h.hero.eyebrow}
+    </span>
+    <h1 class="hero-title opacity-0 font-display text-4xl sm:text-5xl md:text-7xl font-semibold text-warmwhite max-w-3xl leading-[1.1]">
+      {h.hero.title}
+      <span class="block bg-clip-text text-transparent" style="background-image: linear-gradient(120deg, #F3E6B3, #D4AF37);">
+        {h.hero.highlight}
+      </span>
+    </h1>
+    <p class="hero-subtitle opacity-0 mt-6 text-platinum max-w-xl text-base md:text-lg">
+      {h.hero.subtitle}
+    </p>
+    <div class="hero-ctas opacity-0 mt-9 flex flex-col sm:flex-row gap-4">
+      <a href="#industries" class="px-7 py-3.5 text-sm font-medium tracking-wide text-charcoal text-center" style="background: linear-gradient(135deg, #F3E6B3, #D4AF37);">
+        {h.hero.ctaPrimary}
+      </a>
+      <a href="#about" class="px-7 py-3.5 text-sm font-medium tracking-wide text-warmwhite border border-platinum/30 hover:border-gold/60 transition-colors text-center">
+        {h.hero.ctaSecondary}
+      </a>
+    </div>
+  </div>
+</section>
+
+<script>
+  import gsap from 'gsap';
+  gsap.timeline({ defaults: { ease: 'power3.out', duration: 1 }, delay: 0.2 })
+    .fromTo('.hero-eyebrow', { opacity: 0, y: 16 }, { opacity: 1, y: 0 })
+    .fromTo('.hero-title', { opacity: 0, y: 30 }, { opacity: 1, y: 0 }, '-=0.6')
+    .fromTo('.hero-subtitle', { opacity: 0, y: 20 }, { opacity: 1, y: 0 }, '-=0.7')
+    .fromTo('.hero-ctas', { opacity: 0, y: 20 }, { opacity: 1, y: 0 }, '-=0.6');
+</script>
