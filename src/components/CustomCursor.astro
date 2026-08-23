@@ -1,0 +1,104 @@
+---
+// کرسر سفارشی طلایی — سراسری، روی کل سایت (Coming Soon + Home Preview)
+---
+
+<div id="custom-cursor-root" class="pointer-events-none fixed inset-0 z-[9999]" aria-hidden="true">
+  <div class="cursor-dot"></div>
+  <div class="cursor-ring"></div>
+</div>
+
+<style>
+  #custom-cursor-root {
+    display: none;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    #custom-cursor-root {
+      display: block;
+    }
+  }
+  .cursor-dot {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 6px;
+    height: 6px;
+    background: #d4af37;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    will-change: transform;
+  }
+  .cursor-ring {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 34px;
+    height: 34px;
+    border: 1px solid rgba(212, 175, 55, 0.55);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    will-change: transform, width, height;
+    transition: width 0.25s ease, height 0.25s ease, border-color 0.25s ease, background-color 0.25s ease;
+  }
+  .cursor-ring.is-active {
+    width: 60px;
+    height: 60px;
+    background: rgba(212, 175, 55, 0.08);
+    border-color: rgba(212, 175, 55, 0.9);
+  }
+  /* فقط وقتی جاوااسکریپت با موفقیت فعالش کرد، کرسر نیتیو رو مخفی می‌کنیم —
+     اگه به هر دلیلی JS اجرا نشه، کرسر عادی همچنان در دسترسه. */
+  body.has-custom-cursor,
+  body.has-custom-cursor a,
+  body.has-custom-cursor button {
+    cursor: none;
+  }
+</style>
+
+<script>
+  import gsap from 'gsap';
+
+  function initCustomCursor() {
+    if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    const dot = document.querySelector('.cursor-dot') as HTMLElement | null;
+    const ring = document.querySelector('.cursor-ring') as HTMLElement | null;
+    if (!dot || !ring) return;
+    if (dot.dataset.inited) return;
+    dot.dataset.inited = '1';
+
+    document.body.classList.add('has-custom-cursor');
+
+    const dotX = gsap.quickTo(dot, 'x', { duration: 0.08, ease: 'power2.out' });
+    const dotY = gsap.quickTo(dot, 'y', { duration: 0.08, ease: 'power2.out' });
+    const ringX = gsap.quickTo(ring, 'x', { duration: 0.35, ease: 'power3.out' });
+    const ringY = gsap.quickTo(ring, 'y', { duration: 0.35, ease: 'power3.out' });
+
+    const onMove = (e: MouseEvent) => {
+      dotX(e.clientX);
+      dotY(e.clientY);
+      ringX(e.clientX);
+      ringY(e.clientY);
+    };
+    window.addEventListener('mousemove', onMove);
+
+    const interactiveSelector = 'a, button, .tilt-card, input, textarea, [role="button"]';
+    const onOver = (e: MouseEvent) => {
+      const target = (e.target as HTMLElement)?.closest(interactiveSelector);
+      ring.classList.toggle('is-active', !!target);
+    };
+    window.addEventListener('mouseover', onOver);
+
+    document.addEventListener(
+      'astro:before-swap',
+      () => {
+        window.removeEventListener('mousemove', onMove);
+        window.removeEventListener('mouseover', onOver);
+        document.body.classList.remove('has-custom-cursor');
+      },
+      { once: true }
+    );
+  }
+
+  document.addEventListener('astro:page-load', initCustomCursor);
+</script>

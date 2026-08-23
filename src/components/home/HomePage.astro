@@ -1,10 +1,11 @@
 ---
 import Header from './Header.astro';
 import Hero from './Hero.astro';
+import MarqueeTicker from './MarqueeTicker.astro';
 import StatsBar from './StatsBar.astro';
 import Intro from './Intro.astro';
 import ExploreGrid from './ExploreGrid.astro';
-import IndustriesSection from './IndustriesSection.astro';
+import IndustriesStory from './IndustriesStory.astro';
 import WhyChoose from './WhyChoose.astro';
 import ProcessSteps from './ProcessSteps.astro';
 import NewsSection from './NewsSection.astro';
@@ -22,11 +23,12 @@ const { lang, h } = Astro.props;
 
 <div class="bg-charcoal">
   <Header lang={lang} h={h} />
+  <IndustriesStory h={h} />
   <Hero h={h} />
+  <MarqueeTicker h={h} />
   <StatsBar h={h} />
   <Intro h={h} />
   <ExploreGrid h={h} />
-  <IndustriesSection h={h} />
   <WhyChoose h={h} />
   <ProcessSteps h={h} />
   <NewsSection h={h} />
@@ -40,6 +42,9 @@ const { lang, h } = Astro.props;
   function initHomePage() {
     const sections = document.querySelectorAll('.reveal-section');
     if (!sections.length) return; // یعنی توی صفحه‌ی دیگه‌ای هستیم (نه Home Preview)
+    const firstSection = sections[0] as HTMLElement;
+    if (firstSection.dataset.homeInited) return;
+    firstSection.dataset.homeInited = '1';
 
     import('gsap/ScrollTrigger').then(({ ScrollTrigger }) => {
       gsap.registerPlugin(ScrollTrigger);

@@ -11,20 +11,28 @@ const { h } = Astro.props;
   <div class="hero-bg-wrap absolute inset-0 -z-10">
     <img src="/mock/hero-bg.jpg" alt="" class="hero-bg-img w-full h-full object-cover" />
     <div class="absolute inset-0" style="background: linear-gradient(180deg, rgba(13,13,13,0.35) 0%, rgba(13,13,13,0.55) 55%, #0D0D0D 100%);"></div>
-    <!-- بوم Three.js — ذرات ظریف طلایی/پلاتینیوم در عمق سه‌بعدی -->
+    <!-- بوم Three.js — ذرات درخشان طلایی در عمق سه‌بعدی -->
     <canvas class="hero-particles absolute inset-0 w-full h-full" aria-hidden="true"></canvas>
+    <!-- هاله‌ی نوری که دنبال موس می‌چرخه -->
+    <div class="hero-spotlight pointer-events-none absolute inset-0"></div>
   </div>
 
   <div class="max-w-7xl mx-auto px-6 md:px-10 pb-16 md:pb-24 pt-40 w-full">
     <span class="hero-eyebrow opacity-0 inline-block mb-5 text-xs md:text-sm tracking-widest2 uppercase text-gold-light">
       {h.hero.eyebrow}
     </span>
-    <h1 class="hero-title opacity-0 font-display text-4xl sm:text-5xl md:text-7xl font-semibold text-warmwhite max-w-3xl leading-[1.1]">
-      {h.hero.title}
-      <span class="block bg-clip-text text-transparent" style="background-image: linear-gradient(120deg, #F3E6B3, #D4AF37);">
-        {h.hero.highlight}
+
+    <h1 class="font-display text-4xl sm:text-5xl md:text-7xl font-semibold text-warmwhite max-w-3xl leading-[1.1]">
+      <span class="hero-title-line block overflow-hidden">
+        <span class="hero-title-inner block">{h.hero.title}</span>
+      </span>
+      <span class="hero-title-line block overflow-hidden">
+        <span class="hero-title-inner hero-highlight block bg-clip-text text-transparent" style="background-image: linear-gradient(120deg, #F3E6B3, #D4AF37);">
+          {h.hero.highlight}
+        </span>
       </span>
     </h1>
+
     <p class="hero-subtitle opacity-0 mt-6 text-platinum max-w-xl text-base md:text-lg">
       {h.hero.subtitle}
     </p>
@@ -39,20 +47,45 @@ const { h } = Astro.props;
   </div>
 </section>
 
+<style>
+  .hero-bg-img {
+    animation: kenburns 24s ease-in-out infinite alternate;
+  }
+  @keyframes kenburns {
+    from { transform: scale(1) translate(0, 0); }
+    to { transform: scale(1.08) translate(-1%, -1%); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hero-bg-img { animation: none; }
+  }
+  .hero-spotlight {
+    background: radial-gradient(280px circle at var(--sx, 50%) var(--sy, 30%), rgba(212, 175, 55, 0.16), transparent 70%);
+    transition: opacity 0.4s ease;
+    opacity: 0;
+  }
+  .hero-spotlight.is-active {
+    opacity: 1;
+  }
+</style>
+
 <script>
   import gsap from 'gsap';
 
   function initHero() {
-    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const heroSection = document.querySelector('.hero-section');
     if (!heroSection) return; // این صفحه هیرو نداره (مثلاً صفحه‌ی Coming Soon)
+    if ((heroSection as HTMLElement).dataset.inited) return;
+    (heroSection as HTMLElement).dataset.inited = '1';
 
-    // ---------- تایم‌لاین ورود ----------
-    gsap.timeline({ defaults: { ease: 'power3.out', duration: 1 }, delay: 0.2 })
-      .fromTo('.hero-eyebrow', { opacity: 0, y: 16 }, { opacity: 1, y: 0 })
-      .fromTo('.hero-title', { opacity: 0, y: 30 }, { opacity: 1, y: 0 }, '-=0.6')
-      .fromTo('.hero-subtitle', { opacity: 0, y: 20 }, { opacity: 1, y: 0 }, '-=0.7')
-      .fromTo('.hero-ctas', { opacity: 0, y: 20 }, { opacity: 1, y: 0 }, '-=0.6');
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // ---------- تایم‌لاین ورود قوی‌تر (ماسک‌دار برای عنوان) ----------
+    gsap.set('.hero-title-inner', { yPercent: 120, rotate: 4 });
+    const tl = gsap.timeline({ defaults: { ease: 'power4.out', duration: 1.1 }, delay: 0.15 });
+    tl.fromTo('.hero-eyebrow', { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.7 })
+      .to('.hero-title-inner', { yPercent: 0, rotate: 0, duration: 1.2, stagger: 0.12, ease: 'expo.out' }, '-=0.35')
+      .fromTo('.hero-subtitle', { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.8 }, '-=0.6')
+      .fromTo('.hero-ctas', { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.8 }, '-=0.6');
 
     // ---------- پارالاکس تصویر پس‌زمینه موقع اسکرول ----------
     if (!prefersReduced) {
@@ -60,18 +93,34 @@ const { h } = Astro.props;
         gsap.registerPlugin(ScrollTrigger);
         const heroImg = document.querySelector('.hero-bg-img');
         if (heroImg) {
-          gsap.fromTo(
-            heroImg,
-            { yPercent: 0, scale: 1 },
-            {
-              yPercent: 18,
-              scale: 1.12,
-              ease: 'none',
-              scrollTrigger: { trigger: heroSection, start: 'top top', end: 'bottom top', scrub: true },
-            }
-          );
+          gsap.to(heroImg, {
+            yPercent: 16,
+            ease: 'none',
+            scrollTrigger: { trigger: heroSection, start: 'top top', end: 'bottom top', scrub: true },
+          });
         }
       });
+    }
+
+    // ---------- هاله‌ی نوری دنبال‌کننده‌ی موس ----------
+    if (!prefersReduced && window.matchMedia('(hover: hover)').matches) {
+      const spotlight = document.querySelector('.hero-spotlight') as HTMLElement | null;
+      if (spotlight) {
+        const onMove = (e: MouseEvent) => {
+          const rect = heroSection.getBoundingClientRect();
+          if (e.clientY > rect.bottom || e.clientY < rect.top) {
+            spotlight.classList.remove('is-active');
+            return;
+          }
+          spotlight.classList.add('is-active');
+          const x = ((e.clientX - rect.left) / rect.width) * 100;
+          const y = ((e.clientY - rect.top) / rect.height) * 100;
+          spotlight.style.setProperty('--sx', `${x}%`);
+          spotlight.style.setProperty('--sy', `${y}%`);
+        };
+        window.addEventListener('mousemove', onMove);
+        document.addEventListener('astro:before-swap', () => window.removeEventListener('mousemove', onMove), { once: true });
+      }
     }
 
     // ---------- دکمه‌های مگنتیک ----------
@@ -87,10 +136,10 @@ const { h } = Astro.props;
           const rect = btn.getBoundingClientRect();
           const relX = e.clientX - rect.left - rect.width / 2;
           const relY = e.clientY - rect.top - rect.height / 2;
-          xTo(relX * 0.25);
-          yTo(relY * 0.4);
-          xToInner?.(relX * 0.12);
-          yToInner?.(relY * 0.18);
+          xTo(relX * 0.35);
+          yTo(relY * 0.5);
+          xToInner?.(relX * 0.16);
+          yToInner?.(relY * 0.22);
         });
         btn.addEventListener('mouseleave', () => {
           xTo(0);
@@ -101,7 +150,7 @@ const { h } = Astro.props;
       });
     }
 
-    // ---------- بوم ذرات سه‌بعدی (Three.js) ----------
+    // ---------- بوم ذرات درخشان سه‌بعدی (Three.js) ----------
     if (!prefersReduced) {
       import('three').then((THREE) => {
         const canvas = document.querySelector('.hero-particles') as HTMLCanvasElement | null;
@@ -109,30 +158,47 @@ const { h } = Astro.props;
         if (!canvas || !wrap) return;
 
         const isSmall = window.innerWidth < 768;
-        const particleCount = isSmall ? 90 : 220;
+        const particleCount = isSmall ? 70 : 150;
 
         const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: false });
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
 
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 100);
-        camera.position.z = 14;
+        camera.position.z = 11;
 
         const positions = new Float32Array(particleCount * 3);
+        const speeds = new Float32Array(particleCount);
         for (let i = 0; i < particleCount; i++) {
-          positions[i * 3] = (Math.random() - 0.5) * 22;
-          positions[i * 3 + 1] = (Math.random() - 0.5) * 12;
-          positions[i * 3 + 2] = (Math.random() - 0.5) * 14;
+          positions[i * 3] = (Math.random() - 0.5) * 20;
+          positions[i * 3 + 1] = (Math.random() - 0.5) * 11;
+          positions[i * 3 + 2] = (Math.random() - 0.5) * 12;
+          speeds[i] = 0.3 + Math.random() * 0.7;
         }
         const geometry = new THREE.BufferGeometry();
         geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
 
+        // بافت گرد نرم (glow) برای هر ذره — به‌جای نقطه‌ی تخت
+        const glowCanvas = document.createElement('canvas');
+        glowCanvas.width = 64;
+        glowCanvas.height = 64;
+        const ctx = glowCanvas.getContext('2d')!;
+        const grad = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
+        grad.addColorStop(0, 'rgba(255,247,224,1)');
+        grad.addColorStop(0.35, 'rgba(212,175,55,0.9)');
+        grad.addColorStop(1, 'rgba(212,175,55,0)');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, 64, 64);
+        const glowTexture = new THREE.CanvasTexture(glowCanvas);
+
         const material = new THREE.PointsMaterial({
-          color: 0xd4af37,
-          size: 0.045,
+          map: glowTexture,
+          size: 0.42,
           transparent: true,
-          opacity: 0.55,
+          opacity: 0.85,
           sizeAttenuation: true,
+          blending: THREE.AdditiveBlending,
+          depthWrite: false,
         });
         const points = new THREE.Points(geometry, material);
         scene.add(points);
@@ -158,18 +224,23 @@ const { h } = Astro.props;
 
         let rafId: number;
         const clock = new THREE.Clock();
+        const posAttr = geometry.attributes.position as THREE.BufferAttribute;
         function animate() {
           rafId = requestAnimationFrame(animate);
           const t = clock.getElapsedTime();
-          points.rotation.y = t * 0.015;
-          camera.position.x += (mouseX * 0.6 - camera.position.x) * 0.03;
-          camera.position.y += (-mouseY * 0.4 - camera.position.y) * 0.03;
+          for (let i = 0; i < particleCount; i++) {
+            posAttr.array[i * 3 + 1] += Math.sin(t * 0.4 * speeds[i] + i) * 0.0025;
+            posAttr.array[i * 3] += Math.cos(t * 0.3 * speeds[i] + i) * 0.0018;
+          }
+          posAttr.needsUpdate = true;
+          points.rotation.y = t * 0.02;
+          camera.position.x += (mouseX * 0.7 - camera.position.x) * 0.03;
+          camera.position.y += (-mouseY * 0.5 - camera.position.y) * 0.03;
           camera.lookAt(0, 0, 0);
           renderer.render(scene, camera);
         }
         animate();
 
-        // پاک‌سازی کامل موقع خروج از صفحه (جلوگیری از نشتی حافظه با View Transitions)
         document.addEventListener(
           'astro:before-swap',
           () => {
@@ -178,6 +249,7 @@ const { h } = Astro.props;
             window.removeEventListener('resize', resize);
             geometry.dispose();
             material.dispose();
+            glowTexture.dispose();
             renderer.dispose();
           },
           { once: true }

@@ -1,0 +1,44 @@
+---
+import type { HomeContent } from '../../i18n/home';
+
+interface Props {
+  h: HomeContent;
+}
+const { h } = Astro.props;
+
+const items = [h.hero.eyebrow, h.industries.sectionTitle, ...h.whyChoose.features.map((f) => f.title)];
+// این آرایه رو دو بار تکرار می‌کنیم تا حلقه‌ی marquee بدون پرش دیده بشه
+const loopItems = [...items, ...items];
+---
+
+<div class="marquee-wrap relative overflow-hidden border-y border-gold/15 bg-navy/25 py-3 md:py-4">
+  <div class="marquee-track flex items-center gap-10 md:gap-14 whitespace-nowrap w-max">
+    {loopItems.map((item) => (
+      <span class="flex items-center gap-10 md:gap-14">
+        <span class="font-display text-sm md:text-base tracking-widest2 uppercase text-gold-light/90">
+          {item}
+        </span>
+        <span class="text-gold/40 text-xs">&#10022;</span>
+      </span>
+    ))}
+  </div>
+</div>
+
+<style>
+  .marquee-track {
+    animation: marquee-scroll 26s linear infinite;
+  }
+  @keyframes marquee-scroll {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .marquee-track {
+      animation: none;
+    }
+  }
+</style>

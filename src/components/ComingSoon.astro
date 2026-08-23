@@ -44,13 +44,9 @@ const pillarIcons = [
       {t.badge}
     </span>
 
-    <div class="cs-brand opacity-0 mb-3">
-      <h1 class="brand-title font-display text-4xl sm:text-6xl md:text-7xl font-semibold tracking-wide">
-        {t.brandLine1}
-      </h1>
-      <p class="mt-2 text-xs sm:text-sm tracking-widest2 uppercase text-platinum">
-        {t.brandLine2}
-      </p>
+    <div class="cs-brand opacity-0 mb-3 relative inline-block overflow-hidden">
+      <img src="/brand/logo-full.png" alt="Eleganza United Business" class="brand-logo w-56 sm:w-72 md:w-80 h-auto mx-auto" />
+      <span class="brand-shimmer pointer-events-none absolute inset-0"></span>
     </div>
 
     <h2 class="cs-headline opacity-0 font-display text-xl sm:text-2xl md:text-3xl text-warmwhite max-w-2xl mt-6">
@@ -122,12 +118,11 @@ const pillarIcons = [
 </main>
 
 <style>
-  .brand-title {
-    background-image: linear-gradient(120deg, #f3e6b3 0%, #d4af37 35%, #f7f6f2 50%, #d4af37 65%, #f3e6b3 100%);
-    background-size: 250% auto;
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
+  .brand-shimmer {
+    background: linear-gradient(120deg, transparent 35%, rgba(255, 255, 255, 0.5) 50%, transparent 65%);
+    background-size: 250% 100%;
+    background-position: 150% 0;
+    mix-blend-mode: overlay;
   }
 
   .notify-btn {
@@ -196,7 +191,7 @@ const pillarIcons = [
       .to('.cs-pillars', { opacity: 1, duration: 0.3 }, '<')
       .fromTo('.cs-footer', { opacity: 0 }, { opacity: 1, duration: 0.6 }, '-=0.2');
 
-    gsap.to('.brand-title', { backgroundPosition: '250% center', duration: 6, repeat: -1, ease: 'none' });
+    gsap.to('.brand-shimmer', { backgroundPosition: '-100% 0', duration: 3.5, repeat: -1, repeatDelay: 2, ease: 'power1.inOut' });
     gsap.to('.emblem-wrap', { y: -6, duration: 2.6, repeat: -1, yoyo: true, ease: 'sine.inOut', delay: 1.5 });
     gsap.to('.cs-badge', { scale: 1.05, duration: 1.8, repeat: -1, yoyo: true, ease: 'sine.inOut', delay: 1.5 });
 
