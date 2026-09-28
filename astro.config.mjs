@@ -6,7 +6,8 @@ import sitemap from '@astrojs/sitemap';
 export default defineConfig({
   site: 'https://eleganzaco.com',
   integrations: [
-    tailwind(),
+    // base رو خودمون تو global.css (فقط Layout.astro) می‌گیریم؛ Layout ویدیو-اسکرول عمداً بدون Tailwind base ساخته شده
+    tailwind({ applyBaseStyles: false }),
     sitemap({
       i18n: {
         defaultLocale: 'fa',

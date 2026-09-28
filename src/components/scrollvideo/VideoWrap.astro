@@ -1,0 +1,30 @@
+---
+// تنها جایی که ScrollyVideo ساخته می‌شه. تنظیمات دقیقاً همون تست (step12).
+// ساخت روی astro:page-load و منتظر لود شدن کتابخونه (لازمه چون ViewTransitions فعاله).
+// وقتی از نتیجه راضی بودی، debug: true رو حذف کن (فقط لاگ کنسوله).
+---
+
+<div class="wrap">
+  <div id="scrolly-video"></div>
+</div>
+
+<script is:inline>
+  document.addEventListener('astro:page-load', function () {
+    if (!document.getElementById('scrolly-video')) return;
+
+    (function boot() {
+      if (!window.ScrollyVideo) { setTimeout(boot, 50); return; }
+      new ScrollyVideo({
+        scrollyVideoContainer: 'scrolly-video',
+        src: '/media/house-renovation.mp4',
+        transitionSpeed: 12,
+        frameThreshold: 0.05,
+        debug: true
+      });
+    })();
+  });
+</script>
+
+<style is:global>
+  .wrap { height: 400vh; position: relative; }
+</style>

@@ -1,0 +1,87 @@
+---
+// سه ویدیو پشت‌سرهم، هرکدوم با متن خودش (یکی از سه شعار برند)، بعدش هدر/منو و آمار.
+import ScrollVideoLayout from '../../layouts/ScrollVideoLayout.astro';
+import VideoSegment from './VideoSegment.astro';
+import Nav from './Nav.astro';
+import Stat from './Stat.astro';
+import { scrollVideoContent } from '../../i18n/scrollvideo';
+import { cinematicContent } from '../../i18n/cinematic';
+import { translations } from '../../i18n/translations';
+import type { Locale } from '../../i18n/translations';
+
+interface Props { lang: Locale }
+const { lang } = Astro.props;
+const s = scrollVideoContent[lang];
+const c = cinematicContent[lang];
+const t = translations[lang];
+---
+
+<ScrollVideoLayout title={`${s.pageTitle} — ${s.titleLine1} ${s.titleLine2}`} description={s.sub} lang={lang}>
+  <VideoSegment
+    id="house"
+    src="/media/house-renovation.mp4"
+    title={t.pillars[0].title}
+    description={t.pillars[0].description}
+    heightVh={350}
+    isFirst
+  />
+  <VideoSegment
+    id="clock"
+    src="/media/clock.mp4"
+    title={t.pillars[1].title}
+    description={t.pillars[1].description}
+    heightVh={500}
+  />
+  <VideoSegment
+    id="sunset"
+    src="/media/sunset.mp4"
+    title={t.pillars[2].title}
+    description={t.pillars[2].description}
+    ctaLabel={c.cta}
+    ctaHref={`/${lang}/`}
+    heightVh={400}
+  />
+  <Nav lang={lang} />
+  <Stat lang={lang} />
+</ScrollVideoLayout>
+
+<script is:inline>
+  // ---------- محو متقابل بین ویدیوها ----------
+  // هر سکشن (به‌جز اولی) با -60vh روی انتهای سکشن قبلی می‌شینه (تو VideoSegment.astro).
+  // همون بازه‌ی ۶۰vh رو این‌جا اپاسیتی می‌دیم: سکشن جاری محو میشه بیرون درست همون
+  // لحظه‌ای که سکشن بعدی محو میشه داخل. عدد FADE_VH باید با VideoSegment.astro یکی باشه.
+  document.addEventListener('astro:page-load', function () {
+    var FADE_VH = 60;
+    var segments = Array.prototype.slice.call(document.querySelectorAll('[data-fade-segment]'));
+    if (!segments.length) return;
+
+    var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduced) {
+      segments.forEach(function (el) { el.style.opacity = '1'; });
+      return;
+    }
+
+    function onScroll() {
+      var vh = window.innerHeight;
+      var fadePx = FADE_VH * (vh / 100);
+
+      segments.forEach(function (el, i) {
+        var rect = el.getBoundingClientRect();
+
+        // محو-به-داخل: فقط برای سکشن‌هایی که قبلشون یکی دیگه هست.
+        // چون سکشن جاری margin-top منفی داره، لحظه‌ی شروع هم‌پوشانی دقیقاً
+        // وقتیه که rect.top این سکشن صفره؛ هرچی جلوتر بریم منفی‌تر می‌شه.
+        var fadeIn = i === 0 ? 1 : Math.max(0, Math.min(1, -rect.top / fadePx));
+
+        // محو-به-بیرون: فقط برای سکشن‌هایی که بعدشون یکی دیگه هست.
+        var isLast = i === segments.length - 1;
+        var fadeOut = isLast ? 1 : Math.max(0, Math.min(1, rect.bottom / fadePx));
+
+        el.style.opacity = String(Math.min(fadeIn, fadeOut));
+      });
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+  });
+</script>

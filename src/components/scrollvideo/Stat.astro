@@ -1,0 +1,82 @@
+---
+// سکشن پایانی، مستقل از ویدیوها (نه sticky، نه sticky-overlay) — بعد از سه ویدیو
+// می‌رسی بهش، مثل جمع‌بندی. + شمارنده (GSAP) + نوار پیشرفت کل صفحه + Scroll hint.
+import type { Locale } from '../../i18n/translations';
+import { scrollVideoContent } from '../../i18n/scrollvideo';
+
+interface Props { lang: Locale }
+const { lang } = Astro.props;
+const s = scrollVideoContent[lang];
+const zero = (0).toLocaleString(s.numberLocale);
+---
+
+<section class="stat-section">
+  <img src="/brand/logo-icon.png" class="ov-stat-emblem" id="statSpinEmblem" alt="" />
+  <div class="ov-stat-big" dir="ltr"><span id="journey-counter" data-target={s.statValue} data-locale={s.numberLocale}>{zero}</span>+</div>
+  <div class="ov-stat-label">{s.statLabel}</div>
+</section>
+
+<div class="page-progress" id="pageProgress"></div>
+<div class="scroll-hint" id="scrollHint">{s.scrollHint}</div>
+
+<script is:inline>
+  document.addEventListener('astro:page-load', function () {
+    var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var statSection = document.querySelector('.stat-section');
+    var bar = document.getElementById('pageProgress');
+    var hint = document.getElementById('scrollHint');
+    var emblem = document.getElementById('statSpinEmblem');
+    var counterEl = document.getElementById('journey-counter');
+    if (!statSection || !counterEl) return;
+
+    var target = parseInt(counterEl.getAttribute('data-target'), 10) || 0;
+    var locale = counterEl.getAttribute('data-locale') || 'en-US';
+    var counted = false;
+
+    function fmt(n) {
+      try { return Math.round(n).toLocaleString(locale); } catch (e) { return String(Math.round(n)); }
+    }
+
+    function onScroll() {
+      // نوار پیشرفت: کل صفحه (سه ویدیو + آمار)، نه یه ویدیوی خاص
+      var doc = document.documentElement;
+      var total = doc.scrollHeight - window.innerHeight;
+      var progress = total > 0 ? Math.min(1, Math.max(0, window.scrollY / total)) : 0;
+      bar.style.width = (progress * 100) + '%';
+      hint.classList.toggle('is-visible', window.scrollY < 60);
+
+      var rect = statSection.getBoundingClientRect();
+      emblem.style.transform = 'rotate(' + ((1 - Math.max(0, Math.min(1, rect.top / window.innerHeight))) * 360) + 'deg)';
+
+      if (!counted && rect.top < window.innerHeight * 0.7) {
+        counted = true;
+        if (reduced || typeof gsap === 'undefined') { counterEl.textContent = fmt(target); return; }
+        var counter = { val: 0 };
+        gsap.to(counter, {
+          val: target, duration: 1.4, ease: 'power2.out',
+          onUpdate: function () { counterEl.textContent = fmt(counter.val); }
+        });
+      }
+      if (rect.top > window.innerHeight) counted = false;
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+  });
+</script>
+
+<style is:global>
+  .stat-section {
+    min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center; padding: 80px 24px; background: radial-gradient(ellipse 60% 50% at 50% 50%, rgba(11,31,58,0.5), transparent 70%), #0D0D0D;
+  }
+  .ov-stat-emblem { width: 72px; height: 72px; opacity: .9; margin-bottom: 28px; }
+  @media (min-width: 768px) { .ov-stat-emblem { width: 96px; height: 96px; } }
+  .ov-stat-big { font-family: var(--font-display); font-size: 4.5rem; color: transparent; background: linear-gradient(120deg, #F3E6B3, #D4AF37); -webkit-background-clip: text; background-clip: text; line-height: 1.1; }
+  @media (min-width: 768px) { .ov-stat-big { font-size: 7rem; } }
+  .ov-stat-label { margin-top: 16px; color: rgba(255,255,255,0.85); font-family: var(--font-body); font-size: 1rem; line-height: 1.6; max-width: 32rem; }
+  .page-progress { position: fixed; top: 0; inset-inline-start: 0; height: 2px; width: 0%; background: linear-gradient(90deg, #D4AF37, #F3E6B3); z-index: 55; }
+  .scroll-hint { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%); z-index: 15; color: rgba(255,255,255,0.6); font-family: var(--font-body); font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; opacity: 0; transition: opacity .5s ease; pointer-events: none; }
+  .scroll-hint.is-visible { opacity: 1; }
+  html[lang='fa'] .scroll-hint, html[lang='ar'] .scroll-hint { letter-spacing: 0; text-transform: none; font-size: 13px; }
+</style>

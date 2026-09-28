@@ -1,0 +1,94 @@
+---
+// یه سکشن مستقل: ویدیوی خودش (اسکراب‌شونده با اسکرول) + یه متن که فقط رو همین
+// ویدیو دیده می‌شه. چند تا از این کنار هم بذاری، پشت‌سرهم پخش می‌شن — وقتی
+// اسکرول این سکشن تموم شد، همین‌جوری طبیعی می‌ری سکشن بعدی (که ویدیوی خودشو داره).
+//
+// تکنیک: هم ویدیو هم لایه‌ی متن، هردو position: sticky با top یکسان، داخل یه
+// wrapper بلند مشترک؛ یعنی با هم می‌چسبن و با هم رها می‌شن. نیازی به محاسبه‌ی
+// دستی «چند درصد از کل صفحه» نیست، خود CSS این کارو می‌کنه.
+interface Props {
+  id: string;
+  src: string;
+  title: string;
+  description: string;
+  ctaLabel?: string;
+  ctaHref?: string;
+  heightVh?: number; // پیش‌فرض ۳۵۰ — بلندتر برای ویدیوهای طولانی‌تر (مثل ساعت، ۲۰ ثانیه)
+  isFirst?: boolean; // فقط اولین ویدیو true — چیزی نداره که ازش محو-به-داخل بشه
+}
+const { id, src, title, description, ctaLabel, ctaHref, heightVh = 350, isFirst = false } = Astro.props;
+const videoElId = `scrolly-video-${id}`;
+
+// همپوشانی با انتهای سکشن قبلی (برای محو-متقابل). این باعث می‌شه سکشن جاری از
+// وسط انتهای سکشن قبلی شروع بشه، نه دقیق سر هم؛ خود محوشدن رو اسکریپت مشترک
+// تو ScrollVideoPage.astro با اپاسیتی، بر اساس همین بازه‌ی هم‌پوشان، کنترل می‌کنه.
+const FADE_VH = 60;
+const marginTop = isFirst ? '' : `margin-top: -${FADE_VH}vh;`;
+---
+
+<div class="video-segment" data-fade-segment style={`height: ${heightVh}vh; ${marginTop}`}>
+  <div id={videoElId}></div>
+
+  <div class="seg-dim"></div>
+
+  <div class="seg-text">
+    <h2 class="seg-title">{title}</h2>
+    <p class="seg-desc">{description}</p>
+    {ctaLabel && ctaHref && (
+      <a href={ctaHref} data-astro-reload class="seg-cta">{ctaLabel}</a>
+    )}
+  </div>
+</div>
+
+<script define:vars={{ videoElId, src }}>
+  document.addEventListener('astro:page-load', function () {
+    var target = document.getElementById(videoElId);
+    if (!target) return;
+
+    (function boot() {
+      if (!window.ScrollyVideo) { setTimeout(boot, 50); return; }
+      new ScrollyVideo({
+        scrollyVideoContainer: videoElId,
+        src: src,
+        transitionSpeed: 12,
+        frameThreshold: 0.05
+      });
+    })();
+  });
+</script>
+
+<style is:global>
+  .video-segment { position: relative; background: #0D0D0D; }
+
+  /* ScrollyVideo خودش #scrolly-video-* رو sticky/تمام‌صفحه می‌کنه. متن و لایه‌ی
+     تیره هم دقیقاً همون top:0 رو می‌گیرن تا با هم بچسبن و با هم رها بشن. */
+  .seg-dim, .seg-text {
+    position: sticky; top: 0; height: 100vh; width: 100%;
+  }
+  .seg-dim {
+    z-index: 5; pointer-events: none; margin-top: -100vh; /* برگرد رو همون فریم ویدیو */
+    background: linear-gradient(to left, transparent 0%, transparent 55%, rgba(13,13,13,0.55) 72%, rgba(13,13,13,0.85) 100%);
+  }
+  .seg-text {
+    z-index: 15; margin-top: -100vh;
+    display: flex; flex-direction: column; align-items: flex-start; justify-content: center;
+    text-align: left; padding: 0 24px; padding-left: 6vw; pointer-events: none;
+  }
+  @media (min-width: 1024px) { .seg-text { padding-left: 8vw; } }
+  .seg-title {
+    font-family: var(--font-display); font-weight: 400; color: #F3E6B3;
+    font-size: 2.5rem; line-height: 1.1; margin: 0 0 16px; max-width: 680px;
+    text-shadow: 0 2px 40px rgba(0,0,0,0.7);
+  }
+  @media (min-width: 768px) { .seg-title { font-size: 4rem; } }
+  .seg-desc {
+    color: rgba(255,255,255,0.82); font-family: var(--font-body); font-size: 1rem; line-height: 1.7;
+    max-width: 30rem; margin: 0 0 28px; text-shadow: 0 1px 20px rgba(0,0,0,0.7);
+  }
+  @media (min-width: 768px) { .seg-desc { font-size: 1.125rem; } }
+  .seg-cta {
+    display: inline-block; padding: 14px 32px; background: #fff; color: #000;
+    font-family: var(--font-body); font-size: 14px; font-weight: 500; border-radius: 9999px;
+    text-decoration: none; pointer-events: auto;
+  }
+</style>

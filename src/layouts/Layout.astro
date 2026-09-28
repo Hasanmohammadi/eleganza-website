@@ -34,6 +34,7 @@ const fontUrls: Record<Locale, string> = {
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="stylesheet" href={fontUrls[lang]} />
+    <slot name="head" />
     <!-- انتقال نرم بین صفحات (native Astro، بدون نیاز به React Router) -->
     <ViewTransitions />
   </head>

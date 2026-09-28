@@ -7,14 +7,19 @@
     "start": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "postinstall": "node scripts/copy-vendor.mjs",
+    "predev": "node scripts/copy-vendor.mjs",
+    "prestart": "node scripts/copy-vendor.mjs",
+    "prebuild": "node scripts/copy-vendor.mjs --strict"
   },
   "dependencies": {
     "astro": "^4.16.0",
     "gsap": "^3.12.5",
     "@astrojs/sitemap": "3.6.0",
     "three": "^0.169.0",
-    "lenis": "^1.1.16"
+    "lenis": "^1.1.16",
+    "scrolly-video": "0.0.24"
   },
   "devDependencies": {
     "@astrojs/tailwind": "^5.1.2",

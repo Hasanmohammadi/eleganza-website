@@ -1,0 +1,270 @@
+---
+// یه «صفحه‌ی قفل‌شده»: تا وقتی این بخش فعاله، خود صفحه اصلاً اسکرول نمی‌شه
+// (نه جابه‌جایی، نه اسکرول‌بار). به‌جاش، اسکرول/سوایپ مستقیم روی زمانِ ویدیوی
+// فعال اثر می‌ذاره (جلو/عقب، دقیق مثل اسکراب) — نه پلی خودکار. وقتی به انتهای
+// آخرین ویدیو رسیدی، یه اسکرول دیگه صفحه رو آزاد می‌کنه و ادامه‌ی سایت (هدر/آمار)
+// عادی اسکرول می‌شه. برعکسش هم هست: از پایین برگردی بالا، دوباره قفل می‌شه و از
+// انتهای آخرین ویدیو شروع می‌شه (تا بشه به عقب اسکرابش کرد).
+export interface VideoSlide {
+  src: string;
+  title: string;
+  description: string;
+  ctaLabel?: string;
+  ctaHref?: string;
+}
+interface Props {
+  slides: VideoSlide[];
+}
+const { slides } = Astro.props;
+---
+
+<div class="video-stage" id="videoStage">
+  {slides.map((s, i) => (
+    <div class="video-slide" data-index={i}>
+      <video class="slide-video" src={s.src} muted playsinline preload="auto" />
+      <div class="slide-dim"></div>
+      <div class="slide-text">
+        <h2 class="slide-title">{s.title}</h2>
+        <p class="slide-desc">{s.description}</p>
+        {s.ctaLabel && s.ctaHref && (
+          <a href={s.ctaHref} data-astro-reload class="slide-cta">{s.ctaLabel}</a>
+        )}
+      </div>
+    </div>
+  ))}
+
+  <div class="stage-dots">
+    {slides.map((_, i) => <span class="stage-dot" data-index={i}></span>)}
+  </div>
+  <div class="stage-hint" id="stageHint">Scroll</div>
+</div>
+
+<!-- این جای خالی، دقیقاً هم‌اندازه‌ی استیج، باقی محتوای صفحه (هدر/آمار) رو
+     هول نمی‌ده که بره زیر استیجِ fixed. وقتی صفحه آزاد شد، همینجا استیج
+     می‌شینه تو جریان عادی سند. -->
+<div class="stage-spacer" id="stageSpacer"></div>
+
+<script define:vars={{ slideCount: slides.length }}>
+  document.addEventListener('astro:page-load', function () {
+    var stage = document.getElementById('videoStage');
+    var spacer = document.getElementById('stageSpacer');
+    var hint = document.getElementById('stageHint');
+    if (!stage || !spacer) return;
+    if (stage.dataset.inited) return;
+    stage.dataset.inited = '1';
+
+    var slideEls = Array.prototype.slice.call(stage.querySelectorAll('.video-slide'));
+    var dotEls = Array.prototype.slice.call(stage.querySelectorAll('.stage-dot'));
+    var videos = slideEls.map(function (el) { return el.querySelector('video'); });
+    var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    var current = 0;
+    var locked = true;
+    var progress = new Array(slideCount).fill(0); // موقعیت زمانی (ثانیه) هر ویدیو
+    var primed = new Array(slideCount).fill(false);
+
+    // ثانیه به ازای هر واحد deltaY چرخ‌موس. مرورگرها/دستگاه‌های مختلف مقدار خیلی
+    // متفاوتی برای deltaY می‌دن؛ این عدد رو با تست خودت تنظیم کن (بزرگ‌تر = سریع‌تر).
+    var WHEEL_SECONDS_PER_DELTA = 0.0035;
+    var TOUCH_SECONDS_PER_PIXEL = 0.012;
+
+    function primeVideo(i) {
+      // بعضی مرورگرها تا ویدیو یه‌بار واقعاً play نشه، تغییر دستی currentTime رو
+      // رو صفحه نشون نمی‌دن. این یه پخش/توقف فوری و نامحسوسه که فریم رو «فعال» می‌کنه.
+      if (primed[i]) return;
+      primed[i] = true;
+      var v = videos[i];
+      var p = v.play();
+      if (p && p.then) p.then(function () { v.pause(); }).catch(function () {});
+      else v.pause();
+    }
+
+    function setActive(i) {
+      slideEls.forEach(function (el, idx) { el.classList.toggle('is-active', idx === i); });
+      dotEls.forEach(function (d, idx) { d.classList.toggle('is-active', idx === i); });
+      if (hint) hint.classList.toggle('is-visible', i === 0 && progress[0] < 0.3);
+    }
+
+    function applyTime() {
+      var v = videos[current];
+      if (v && v.readyState >= 1) v.currentTime = progress[current];
+    }
+
+    function lockPage() {
+      locked = true;
+      stage.style.position = 'fixed';
+      document.body.style.overflow = 'hidden';
+      spacer.style.height = '100vh';
+    }
+
+    function unlockPage(direction) {
+      locked = false;
+      stage.style.position = 'static';
+      document.body.style.overflow = '';
+      spacer.style.height = '0px';
+      if (direction === 'down') {
+        window.scrollTo(0, stage.offsetHeight + 1);
+      } else {
+        window.scrollTo(0, 0);
+      }
+    }
+
+    function duration(i) {
+      var d = videos[i] ? videos[i].duration : 0;
+      return d && !isNaN(d) ? d : 0;
+    }
+
+    // dt: چند ثانیه به زمان ویدیوی جاری اضافه/کم بشه (مثبت = جلو، منفی = عقب)
+    function scrub(dt) {
+      var d = duration(current);
+      if (!d) return; // متادیتای ویدیو هنوز لود نشده
+
+      var next = progress[current] + dt;
+
+      if (next >= d) {
+        if (current < slideCount - 1) {
+          var overflow = next - d;
+          progress[current] = d;
+          current++;
+          primeVideo(current);
+          var d2 = duration(current) || 0.001;
+          progress[current] = Math.min(overflow, d2);
+          setActive(current);
+          applyTime();
+        } else {
+          progress[current] = d;
+          unlockPage('down');
+        }
+        return;
+      }
+
+      if (next <= 0) {
+        if (current > 0) {
+          var overflowNeg = -next;
+          progress[current] = 0;
+          current--;
+          var dPrev = duration(current);
+          progress[current] = Math.max(0, dPrev - overflowNeg);
+          setActive(current);
+          applyTime();
+        } else {
+          progress[current] = 0;
+          applyTime();
+        }
+        return;
+      }
+
+      progress[current] = next;
+      applyTime();
+    }
+
+    function onWheel(e) {
+      if (!locked) return;
+      e.preventDefault();
+      scrub(e.deltaY * WHEEL_SECONDS_PER_DELTA);
+    }
+
+    var touchY = 0;
+    function onTouchStart(e) { touchY = e.touches[0].clientY; }
+    function onTouchMove(e) {
+      if (!locked) return;
+      e.preventDefault();
+      var y = e.touches[0].clientY;
+      var dy = touchY - y; // انگشت رو به بالا = محتوا جلو بره (مثل اسکرول)
+      touchY = y;
+      scrub(dy * TOUCH_SECONDS_PER_PIXEL);
+    }
+
+    // برگشت از پایین: وقتی صفحه آزاده و کاربر رسید دقیقاً بالای سایت، دوباره قفل کن
+    // و از انتهای آخرین ویدیو شروع کن (چون داره برمی‌گرده عقب، باید بشه بازم عقب‌ترش برد).
+    function onScrollWhileUnlocked() {
+      if (locked) return;
+      if (window.scrollY <= 0) {
+        lockPage();
+        current = slideCount - 1;
+        primeVideo(current);
+        progress[current] = duration(current);
+        setActive(current);
+        applyTime();
+      }
+    }
+
+    window.addEventListener('wheel', onWheel, { passive: false });
+    window.addEventListener('touchstart', onTouchStart, { passive: true });
+    window.addEventListener('touchmove', onTouchMove, { passive: false });
+    window.addEventListener('scroll', onScrollWhileUnlocked, { passive: true });
+
+    videos.forEach(function (v) { v.pause(); });
+
+    if (reduced) {
+      // برای کاربرانی که انیمیشن کمتر می‌خوان: قفل نکن، فقط اسلاید اول رو نشون بده
+      // و بذار عادی اسکرول کنن (بدون گیرافتادن تو قفل اسکرول).
+      unlockPage('down');
+      setActive(0);
+    } else {
+      lockPage();
+      primeVideo(0);
+      setActive(0);
+    }
+
+    document.addEventListener('astro:before-swap', function () {
+      window.removeEventListener('wheel', onWheel);
+      window.removeEventListener('touchstart', onTouchStart);
+      window.removeEventListener('touchmove', onTouchMove);
+      window.removeEventListener('scroll', onScrollWhileUnlocked);
+      document.body.style.overflow = '';
+    }, { once: true });
+  });
+</script>
+
+<style is:global>
+  .video-stage {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100vh; z-index: 10; overflow: hidden; background: #0D0D0D;
+  }
+  .video-slide {
+    position: absolute; inset: 0; opacity: 0; pointer-events: none;
+    transition: opacity 0.7s ease;
+  }
+  .video-slide.is-active { opacity: 1; z-index: 2; pointer-events: auto; }
+  .slide-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .slide-dim {
+    position: absolute; inset: 0; pointer-events: none;
+    background: linear-gradient(to left, transparent 0%, transparent 55%, rgba(13,13,13,0.55) 72%, rgba(13,13,13,0.85) 100%);
+  }
+  .slide-text {
+    position: absolute; inset: 0; display: flex; flex-direction: column; align-items: flex-start; justify-content: center;
+    text-align: left; padding: 0 24px; padding-left: 6vw;
+  }
+  @media (min-width: 1024px) { .slide-text { padding-left: 8vw; } }
+  .slide-title {
+    font-family: var(--font-display); font-weight: 400; color: #F3E6B3;
+    font-size: 2.5rem; line-height: 1.1; margin: 0 0 16px; max-width: 680px;
+    text-shadow: 0 2px 40px rgba(0,0,0,0.7);
+  }
+  @media (min-width: 768px) { .slide-title { font-size: 4rem; } }
+  .slide-desc {
+    color: rgba(255,255,255,0.82); font-family: var(--font-body); font-size: 1rem; line-height: 1.7;
+    max-width: 30rem; margin: 0 0 28px; text-shadow: 0 1px 20px rgba(0,0,0,0.7);
+  }
+  @media (min-width: 768px) { .slide-desc { font-size: 1.125rem; } }
+  .slide-cta {
+    display: inline-block; padding: 14px 32px; background: #fff; color: #000;
+    font-family: var(--font-body); font-size: 14px; font-weight: 500; border-radius: 9999px; text-decoration: none;
+  }
+
+  .stage-dots { position: absolute; bottom: 32px; left: 50%; transform: translateX(-50%); z-index: 20; display: flex; gap: 10px; }
+  .stage-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.3); transition: background-color 0.3s ease, transform 0.3s ease; }
+  .stage-dot.is-active { background: #D4AF37; transform: scale(1.3); }
+
+  .stage-hint {
+    position: absolute; bottom: 60px; left: 50%; transform: translateX(-50%); z-index: 20;
+    color: rgba(255,255,255,0.6); font-family: var(--font-body); font-size: 11px; letter-spacing: 0.15em;
+    text-transform: uppercase; opacity: 0; transition: opacity 0.5s ease;
+  }
+  .stage-hint.is-visible { opacity: 1; }
+  html[lang='fa'] .stage-hint, html[lang='ar'] .stage-hint { letter-spacing: 0; text-transform: none; font-size: 13px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .video-slide { transition: none; }
+  }
+</style>

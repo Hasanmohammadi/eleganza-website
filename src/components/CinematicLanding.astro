@@ -1,0 +1,279 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { locales, type Locale } from '../i18n/translations';
+import { homeContent } from '../i18n/home';
+import { cinematicContent } from '../i18n/cinematic';
+
+interface Props {
+  lang: Locale;
+}
+const { lang } = Astro.props;
+
+const h = homeContent[lang];
+const c = cinematicContent[lang];
+const dir = locales[lang].dir;
+
+// فقط برای انگلیسی از Instrument Serif استفاده می‌کنیم؛ فارسی/عربی فونت برند خودشون رو نگه می‌دارن
+const displayFont =
+  lang === 'en' ? "'Instrument Serif', serif" : lang === 'ar' ? "'Amiri', serif" : "'Vazirmatn', sans-serif";
+
+// ویدیوی پس‌زمینه: چون به ویدیوی اختصاصی دسترسی نداریم، یه فوتیج آزاد و متناسب
+// (نمای هوایی آسمان‌خراش‌های مدرن، مجوز رایگان تجاری از Pexels) جایگزین شده.
+const videoSrc = 'https://videos.pexels.com/video-files/36498297/15476205_1920_1080_25fps.mp4';
+---
+
+<Layout
+  title={`Eleganza United Business — ${h.hero.title} ${h.hero.highlight}`}
+  description={c.subcopy}
+  lang={lang}
+  noindex={true}
+>
+  <Fragment slot="head">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap" />
+  </Fragment>
+
+  <div class="cine-root bg-charcoal min-h-screen" style="overflow-x: hidden;">
+    <!-- ================= NAVBAR ================= -->
+    <nav id="cine-nav" class="fixed top-0 left-0 w-full z-50 transition-colors duration-500">
+      <div class="max-w-[1440px] mx-auto px-6 md:px-10 flex items-center justify-between h-16 md:h-20">
+        <a
+          href={`/${lang}/`}
+          class="reveal-nav text-white text-xl md:text-2xl font-semibold tracking-tight z-50"
+        >
+          ELEGANZA
+        </a>
+
+        <button
+          id="cine-pill"
+          type="button"
+          class="reveal-nav hidden md:flex items-center gap-2 px-5 py-2 rounded-full border border-white/20 text-white/90 text-sm hover:bg-white/10 transition-colors"
+          style="transition-delay: 200ms;"
+          data-navigate={c.navigatePill}
+          data-close={c.closePill}
+        >
+          <span class="pill-label">{c.navigatePill}</span>
+        </button>
+
+        <div class="reveal-nav hidden md:flex" style="transition-delay: 400ms;">
+          <a href={`/${lang}/`} aria-label="Eleganza">
+            <img src="/brand/logo-icon.png" alt="" class="w-7 h-7 object-contain opacity-90" />
+          </a>
+        </div>
+
+        <button id="cine-hamburger" type="button" class="md:hidden w-8 h-8 flex flex-col items-center justify-center gap-1.5" aria-label="Toggle menu">
+          <span class="ham-bar w-6 h-[2px] bg-white"></span>
+          <span class="ham-bar w-6 h-[2px] bg-white"></span>
+        </button>
+      </div>
+    </nav>
+
+    <!-- ================= OVERLAY MENU ================= -->
+    <div id="cine-overlay" class="fixed inset-0 z-40 bg-charcoal opacity-0 invisible">
+      <div class="h-full flex flex-col items-center justify-center gap-8">
+        {
+          c.overlayLinks.map((link, i) => (
+            <a
+              href={link.href}
+              class="overlay-link text-white text-4xl md:text-6xl hover:opacity-60 opacity-0 translate-y-6"
+              style={`font-family: ${displayFont}; transition: opacity 0.6s cubic-bezier(0.76,0,0.24,1), transform 0.6s cubic-bezier(0.76,0,0.24,1); transition-delay: ${150 + i * 80}ms;`}
+              data-index={i}
+            >
+              {link.label}
+            </a>
+          ))
+        }
+      </div>
+    </div>
+
+    <!-- ================= HERO ================= -->
+    <section class="relative w-full h-screen overflow-hidden flex items-end justify-center">
+      <div class="reveal-bg absolute inset-0">
+        <video autoplay muted loop playsinline class="w-full h-full object-cover" src={videoSrc}></video>
+        <!-- لایه‌ی تیره‌ی ملایم برای خوانایی متن، هماهنگ با برند -->
+        <div class="absolute inset-0 bg-charcoal/35"></div>
+      </div>
+
+      <div class="relative z-10 text-center px-6 pb-16 md:pb-24 max-w-4xl mx-auto">
+        <h1
+          class="reveal-hero text-white text-[2.5rem] leading-[0.95] sm:text-5xl md:text-6xl lg:text-7xl mb-5 md:mb-6"
+          style={`font-family: ${displayFont}; transition-delay: 400ms;`}
+        >
+          {h.hero.title}
+          <br class="hidden sm:block" />
+          {h.hero.highlight}
+        </h1>
+
+        <p class="reveal-hero text-white/70 text-base md:text-lg mb-8 md:mb-10 max-w-md mx-auto" style="transition-delay: 600ms;">
+          {c.subcopy}
+        </p>
+
+        <a
+          href="#notify"
+          class="reveal-hero inline-block px-8 py-3.5 bg-white text-black text-sm md:text-base font-medium rounded-full hover:bg-white/90"
+          style="transition-delay: 800ms;"
+        >
+          {c.cta}
+        </a>
+      </div>
+    </section>
+  </div>
+</Layout>
+
+<style>
+  * {
+    box-sizing: border-box;
+  }
+
+  /* ---------- ورود navbar ---------- */
+  .reveal-nav {
+    opacity: 0;
+    transform: translateY(-16px);
+    transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .reveal-nav.is-in {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ---------- ورود پس‌زمینه‌ی ویدیویی ---------- */
+  .reveal-bg {
+    opacity: 0;
+    transform: scale(1.05);
+    transition: opacity 1.4s cubic-bezier(0.16, 1, 0.3, 1), transform 1.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .reveal-bg.is-in {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  /* ---------- ورود عناصر هیرو ---------- */
+  .reveal-hero {
+    opacity: 0;
+    transform: translateY(32px);
+    transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1), transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .reveal-hero.is-in {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ---------- هامبرگر ---------- */
+  .ham-bar {
+    transition: transform 0.5s cubic-bezier(0.76, 0, 0.24, 1);
+  }
+  #cine-hamburger.is-open .ham-bar:first-child {
+    transform: rotate(45deg) translateY(6px);
+  }
+  #cine-hamburger.is-open .ham-bar:last-child {
+    transform: rotate(-45deg) translateY(-6px);
+  }
+
+  /* ---------- overlay ---------- */
+  #cine-overlay {
+    transition: opacity 0.7s cubic-bezier(0.76, 0, 0.24, 1);
+  }
+  #cine-overlay.is-open {
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+  .overlay-link.is-in {
+    opacity: 1 !important;
+    transform: translateY(0) !important;
+  }
+
+  /* ---------- navbar بعد از اسکرول ---------- */
+  #cine-nav.is-scrolled {
+    background-color: rgba(13, 13, 13, 0.8);
+    backdrop-filter: blur(12px);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .reveal-nav,
+    .reveal-bg,
+    .reveal-hero,
+    .overlay-link,
+    #cine-overlay,
+    .ham-bar {
+      transition-duration: 0.01ms !important;
+    }
+  }
+</style>
+
+<script>
+  function initCinematic() {
+    const root = document.querySelector('.cine-root');
+    if (!root) return;
+    if ((root as HTMLElement).dataset.inited) return;
+    (root as HTMLElement).dataset.inited = '1';
+
+    // ---------- ورود navbar و هیرو ----------
+    setTimeout(() => {
+      document.querySelectorAll('.reveal-nav').forEach((el) => el.classList.add('is-in'));
+    }, 100);
+    setTimeout(() => {
+      document.querySelectorAll('.reveal-bg, .reveal-hero').forEach((el) => el.classList.add('is-in'));
+    }, 300);
+
+    // ---------- تغییر پس‌زمینه‌ی navbar بعد از اسکرول ----------
+    const nav = document.getElementById('cine-nav');
+    const onScroll = () => {
+      if (!nav) return;
+      if (window.scrollY > 40) nav.classList.add('is-scrolled');
+      else nav.classList.remove('is-scrolled');
+    };
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+
+    // ---------- منوی overlay تمام‌صفحه ----------
+    const pillBtn = document.getElementById('cine-pill');
+    const hamburger = document.getElementById('cine-hamburger');
+    const overlay = document.getElementById('cine-overlay');
+    const overlayLinks = document.querySelectorAll<HTMLElement>('.overlay-link');
+    const pillLabel = pillBtn?.querySelector('.pill-label');
+
+    let isOpen = false;
+
+    function toggleOverlay() {
+      isOpen = !isOpen;
+
+      if (isOpen) {
+        overlay?.classList.remove('invisible');
+        overlay?.classList.add('is-open');
+        hamburger?.classList.add('is-open');
+        document.body.style.overflow = 'hidden';
+        overlayLinks.forEach((link) => link.classList.add('is-in'));
+        if (pillLabel && pillBtn) pillLabel.textContent = pillBtn.dataset.close ?? '';
+      } else {
+        overlay?.classList.remove('is-open');
+        hamburger?.classList.remove('is-open');
+        document.body.style.overflow = '';
+        overlayLinks.forEach((link) => link.classList.remove('is-in'));
+        if (pillLabel && pillBtn) pillLabel.textContent = pillBtn.dataset.navigate ?? '';
+        window.setTimeout(() => {
+          if (!isOpen) overlay?.classList.add('invisible');
+        }, 700);
+      }
+    }
+
+    pillBtn?.addEventListener('click', toggleOverlay);
+    hamburger?.addEventListener('click', toggleOverlay);
+    overlayLinks.forEach((link) => {
+      link.addEventListener('click', () => {
+        if (isOpen) toggleOverlay();
+      });
+    });
+
+    document.addEventListener(
+      'astro:before-swap',
+      () => {
+        window.removeEventListener('scroll', onScroll);
+        document.body.style.overflow = '';
+      },
+      { once: true }
+    );
+  }
+
+  document.addEventListener('astro:page-load', initCinematic);
+</script>
