@@ -55,3 +55,56 @@ html[lang='ar'] .font-display {
     transition-duration: 0.01ms !important;
   }
 }
+
+
+/* ماسک خطوط تیتر (برای انیمیشن «بالا اومدن متن»): فضای کافی بالا/پایین تا دنباله‌ی حروف
+   (مثل «ی»، «پ»، «g») و اعراب عربی بریده نشن؛ margin منفی فاصله‌ی ظاهری رو ثابت نگه می‌داره */
+.line-mask {
+  overflow: hidden;
+  padding-top: 0.06em;
+  padding-bottom: 0.16em;
+  margin-bottom: -0.1em;
+}
+html[lang='fa'] .line-mask,
+html[lang='ar'] .line-mask {
+  padding: 0.24em 0.3em 0.42em;
+  margin: -0.18em -0.3em -0.34em;
+}
+/* کمی جای افقی هم برای انگلیسی (حروف ایتالیک/سریف از لبه بیرون می‌زنن) */
+html[lang='en'] .line-mask {
+  padding-inline: 0.1em;
+  margin-inline: -0.1em;
+}
+
+/* متن‌های طلایی (گرادیان با background-clip:text و رنگ شفاف):
+   هر جای حرف که از جعبه‌ی خود متن بیرون بزنه گرادیان نداره و نامرئی می‌شه.
+   حروف عربی/فارسی (مخصوصاً فونت Amiri) دنباله و سرکش‌هایی دارن که از جعبه بیرون می‌زنن،
+   پس به جعبه padding می‌دیم تا گرادیان کل حرف رو بپوشونه؛ margin منفی جای متن رو ثابت نگه می‌داره. */
+.bg-clip-text {
+  padding: 0.06em 0.12em 0.16em;
+  margin: -0.06em -0.12em -0.16em;
+}
+html[lang='fa'] .bg-clip-text,
+html[lang='ar'] .bg-clip-text {
+  padding: 0.3em 0.35em 0.45em;
+  margin: -0.3em -0.35em -0.45em;
+}
+
+/* سایه‌های روی عکس (fade): عکس‌ها با GSAP زوم می‌شن و لایه‌ی جدا می‌گیرن؛ لبه‌ی عکس گاهی یه پیکسل
+   از زیر سایه بیرون می‌زد و موقع اسکرول یه خط روشن کنار عکس ظاهر/غیب می‌شد.
+   سایه رو کمی بزرگ‌تر از قاب می‌کنیم (قاب overflow:hidden داره) و روی لایه‌ی خودش می‌بریم. */
+.contact-media-fade,
+.statement-media-fade,
+.story-media-fade {
+  inset: -3px !important;
+  transform: translateZ(0);
+}
+/* خود عکس هم کمی بزرگ‌تر از قاب تا لبه‌اش هیچ‌وقت داخل قاب دیده نشه */
+.contact-img,
+.statement-img,
+.story-img {
+  inset: -2px !important;
+  width: calc(100% + 4px) !important;
+  height: calc(100% + 4px) !important;
+  max-width: none;
+}

@@ -1,0 +1,488 @@
+---
+import type { HomeContent } from '../../i18n/home';
+import type { Locale } from '../../i18n/translations';
+
+interface Props {
+  h: HomeContent;
+  lang: Locale;
+}
+const { h, lang } = Astro.props;
+const isLatin = lang === 'en';
+const c = h.contact;
+
+const stepIcons = [
+  '<path d="M21 11.5a8.4 8.4 0 0 1-12.3 7.5L3 21l2-5.3A8.5 8.5 0 1 1 21 11.5Z"/>',
+  '<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h4"/><path d="M14 3v5h5"/><path d="M19 8v3"/><path d="M8.5 9h3M8.5 13h5M8.5 17h2"/><circle cx="17" cy="17.5" r="3.5"/><path d="m15.5 17.5 1 1 2-2"/>',
+  '<path d="m11 17 2 2a1.4 1.4 0 0 0 2-2"/><path d="m14 14 2.5 2.5a1.4 1.4 0 0 0 2-2l-3.9-3.9a2 2 0 0 0-2.8 0l-.9.9a1.4 1.4 0 0 1-2-2l2.8-2.8a3.2 3.2 0 0 1 3.8-.5l.5.3a2.2 2.2 0 0 0 1.4.3H21"/><path d="m21 14-1.6 1.6"/><path d="M3 7h3.2a2 2 0 0 1 1.4.6L10 10"/><path d="m3 14 5.5 5.5a1.4 1.4 0 0 0 2-2"/>',
+];
+const ic = {
+  user: '<circle cx="12" cy="8" r="4"/><path d="M4 21v-1a7 7 0 0 1 16 0v1"/>',
+  mail: '<rect x="3" y="5" width="18" height="14" rx="1.5"/><path d="m3.5 6 8.5 7 8.5-7"/>',
+  phone: '<path d="M21 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 1.1 4.2 2 2 0 0 1 3.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L7.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2Z"/>',
+  building: '<rect x="4" y="3" width="11" height="18" rx="0.5"/><path d="M15 9h5v12h-5"/><path d="M7.5 7h1M11 7h1M7.5 10.5h1M11 10.5h1M7.5 14h1M11 14h1"/><path d="M3 21h18"/>',
+  pen: '<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/>',
+  pin: '<path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/>',
+  link: '<path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/>',
+};
+const socials = [
+  { name: 'LinkedIn', href: '#', path: '<path fill="currentColor" stroke="none" d="M4.98 3.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5ZM3 9h4v12H3zM9 9h3.8v1.7h.05c.53-1 1.83-2.05 3.77-2.05 4.03 0 4.78 2.65 4.78 6.1V21h-4v-5.3c0-1.26-.02-2.88-1.76-2.88-1.76 0-2.03 1.37-2.03 2.79V21H9z"/>' },
+  { name: 'Instagram', href: '#', path: '<rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/>' },
+  { name: 'YouTube', href: '#', path: '<path fill="currentColor" stroke="none" d="M22 8.2a3 3 0 0 0-2.1-2.1C18 5.6 12 5.6 12 5.6s-6 0-7.9.5A3 3 0 0 0 2 8.2 31 31 0 0 0 1.6 12a31 31 0 0 0 .4 3.8 3 3 0 0 0 2.1 2.1c1.9.5 7.9.5 7.9.5s6 0 7.9-.5a3 3 0 0 0 2.1-2.1 31 31 0 0 0 .4-3.8 31 31 0 0 0-.4-3.8ZM10 15.2V8.8l5.2 3.2Z"/>' },
+];
+const telHref = `tel:${c.info.phone.replace(/[^\d+]/g, '')}`;
+const year = new Date().getFullYear();
+---
+
+<!-- سکشن آخر: تماس — فرم + اطلاعات تماس روی پنل تیره، عکس دست‌دادن، و نوار پایانی (لوگو، آمار، نقشه) -->
+<section id="contact" class="contact-sec relative overflow-hidden bg-[#0b0b0b]">
+  <div class="contact-main relative">
+    <!-- عکس -->
+    <div class="contact-media">
+      <img src="/mock/contact.jpg" width="727" height="758" alt="" loading="lazy" decoding="async" class="contact-img absolute inset-0 w-full h-full object-cover" />
+      <div class="contact-media-fade absolute inset-0 pointer-events-none"></div>
+    </div>
+
+    <div class="contact-content relative z-10">
+      <div class="ct-reveal flex items-center gap-4 mb-6">
+        <span class="ct-rule block h-px w-12 md:w-16 bg-gold/80 shrink-0"></span>
+        <span class={`text-[11px] md:text-[13px] font-medium text-gold-light ${isLatin ? 'uppercase tracking-[0.3em]' : ''}`}>{c.eyebrow}</span>
+      </div>
+      <h2 class="font-display text-warmwhite text-[2.4rem] leading-[1.06] sm:text-6xl xl:text-[4.4rem]">
+        <span class="ct-line line-mask block"><span class="ct-line-inner block">{c.title}</span></span>
+        <span class="ct-line line-mask block">
+          <span class="ct-line-inner block bg-clip-text text-transparent" style="background-image: linear-gradient(100deg, #F3E6B3 0%, #E6C878 45%, #D4AF37 100%);">{c.highlight}</span>
+        </span>
+      </h2>
+      <p class="ct-reveal mt-5 text-warmwhite/85 text-[0.95rem] md:text-lg leading-[1.65] max-w-[40rem]">{c.subtitle}</p>
+
+      <!-- سه قدم -->
+      <ul class="ct-steps ct-reveal mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-0">
+        {c.steps.map((step, i) => (
+          <li class="ct-step flex items-center gap-3.5 sm:px-5 first:sm:ps-0">
+            <svg viewBox="0 0 24 24" class="w-9 h-9 shrink-0 text-gold" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" set:html={stepIcons[i]} aria-hidden="true" />
+            <span class={`text-[12px] md:text-[13px] font-medium leading-[1.45] text-warmwhite/90 ${isLatin ? 'uppercase tracking-[0.12em]' : ''}`}>{step}</span>
+          </li>
+        ))}
+      </ul>
+
+      <!-- فرم + اطلاعات تماس -->
+      <div class="ct-panel ct-reveal mt-9 grid gap-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:gap-0">
+        <form class="ct-form rounded-[8px] border border-white/10 bg-black/35 backdrop-blur-sm p-4 md:p-5" data-email={c.info.email} novalidate>
+          <div class="grid gap-3.5 sm:grid-cols-2">
+            <label class="ct-field">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" set:html={ic.user} aria-hidden="true" />
+              <input name="name" type="text" required autocomplete="name" placeholder={c.form.name} aria-label={c.form.name} />
+            </label>
+            <label class="ct-field">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" set:html={ic.mail} aria-hidden="true" />
+              <input name="email" type="email" required autocomplete="email" placeholder={c.form.email} aria-label={c.form.email} dir="ltr" />
+            </label>
+            <label class="ct-field">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" set:html={ic.phone} aria-hidden="true" />
+              <input name="phone" type="tel" autocomplete="tel" placeholder={c.form.phone} aria-label={c.form.phone} />
+            </label>
+            <label class="ct-field ct-select">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" set:html={ic.building} aria-hidden="true" />
+              <select name="type" aria-label={c.form.type}>
+                <option value="" selected disabled>{c.form.type}</option>
+                {c.form.types.map((t) => <option value={t}>{t}</option>)}
+              </select>
+              <svg class="ct-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg>
+            </label>
+            <label class="ct-field ct-textarea sm:col-span-2">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" set:html={ic.pen} aria-hidden="true" />
+              <textarea name="message" rows="3" required placeholder={c.form.message} aria-label={c.form.message}></textarea>
+            </label>
+          </div>
+          <div class="mt-5 flex flex-wrap items-center gap-4">
+            <button type="submit" class={`ct-send inline-flex items-center gap-3 px-8 py-3.5 rounded-full text-[#111] text-[12px] md:text-[13px] font-semibold ${isLatin ? 'uppercase tracking-[0.18em]' : ''}`}>
+              <span>{c.form.send}</span>
+              <svg class="ct-arrow w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h16M14 6l6 6-6 6" /></svg>
+            </button>
+            <p class="ct-status text-[13px] text-gold-light hidden" role="status">{c.form.sent}</p>
+          </div>
+        </form>
+
+        <ul class="ct-info flex flex-col gap-6 lg:ps-7 lg:ms-7">
+          <li class="flex items-start gap-4">
+            <svg viewBox="0 0 24 24" class="ct-info-ic" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" set:html={ic.phone} aria-hidden="true" />
+            <div><a href={telHref} class="block text-warmwhite hover:text-gold-light transition-colors" dir="ltr">{c.info.phone}</a><span class="block mt-0.5 text-[13px] text-platinum">{c.info.phoneNote}</span></div>
+          </li>
+          <li class="flex items-start gap-4">
+            <svg viewBox="0 0 24 24" class="ct-info-ic" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" set:html={ic.mail} aria-hidden="true" />
+            <div><a href={`mailto:${c.info.email}`} class="block text-warmwhite hover:text-gold-light transition-colors" dir="ltr">{c.info.email}</a><span class="block mt-0.5 text-[13px] text-platinum">{c.info.emailNote}</span></div>
+          </li>
+          <li class="flex items-start gap-4">
+            <svg viewBox="0 0 24 24" class="ct-info-ic" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" set:html={ic.pin} aria-hidden="true" />
+            <div><span class="block text-warmwhite">{c.info.city}</span><span class="block mt-0.5 text-[13px] text-platinum">{c.info.cityNote}</span></div>
+          </li>
+          <li class="flex items-start gap-4">
+            <svg viewBox="0 0 24 24" class="ct-info-ic" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" set:html={ic.link} aria-hidden="true" />
+            <div>
+              <span class="block text-warmwhite">{c.info.follow}</span>
+              <div class="mt-2.5 flex items-center gap-4">
+                {socials.map((s) => (
+                  <a href={s.href} aria-label={s.name} class="text-warmwhite/90 hover:text-gold-light transition-colors">
+                    <svg viewBox="0 0 24 24" class="w-[22px] h-[22px]" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" set:html={s.path} />
+                  </a>
+                ))}
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- نوار پایانی: لوگو، آمار، مسیر منطقه‌ای -->
+  <div class="contact-strip relative border-t border-gold/15">
+    <div class="ct-strip-inner relative z-10">
+      <img src="/brand/logo-wordmark.png" alt="Eleganza United Business" width="640" height="124" loading="lazy" class="ct-logo w-[210px] md:w-[250px] h-auto" />
+
+      <div class="ct-stats flex items-stretch">
+        {c.strip.map((s) => (
+          <div class="ct-stat flex flex-col items-center justify-center text-center px-6 md:px-10">
+            <span class="font-display text-gold-light text-[2rem] md:text-[2.3rem] leading-none">{s.value}</span>
+            <span class="mt-1.5 text-[13px] md:text-[15px] text-warmwhite/90">{s.label}</span>
+          </div>
+        ))}
+      </div>
+
+      <!-- مسیر: امارات ← عمان → بازارهای منطقه (همیشه چپ‌به‌راست، مثل نقشه) -->
+      <div class="ct-route relative" dir="ltr" aria-hidden="true">
+        <svg viewBox="0 0 400 110" class="w-full h-full overflow-visible">
+          <defs>
+            <linearGradient id="ct-arc" x1="0" x2="1">
+              <stop offset="0" stop-color="#D4AF37" stop-opacity="0.15" />
+              <stop offset="0.5" stop-color="#F3E6B3" stop-opacity="0.85" />
+              <stop offset="1" stop-color="#D4AF37" stop-opacity="0.15" />
+            </linearGradient>
+          </defs>
+          <path class="ct-arc" d="M 40 58 Q 115 8 195 52" fill="none" stroke="url(#ct-arc)" stroke-width="1.2" />
+          <path class="ct-arc" d="M 195 52 Q 285 6 360 62" fill="none" stroke="url(#ct-arc)" stroke-width="1.2" />
+          <circle cx="40" cy="58" r="3.2" fill="#F3E6B3" />
+          <circle cx="360" cy="62" r="3.2" fill="#F3E6B3" />
+          <circle class="ct-pulse" cx="195" cy="52" r="12" fill="#D4AF37" opacity="0.25" />
+          <circle cx="195" cy="52" r="6" fill="#F3E6B3" />
+        </svg>
+        <span class="ct-region" style="left:10%; top:66%">{c.regions[0]}</span>
+        <span class="ct-region ct-region-main" style="left:48.75%; top:62%">{c.regions[1]}</span>
+        <span class="ct-region" style="left:90%; top:70%">{c.regions[2]}</span>
+      </div>
+    </div>
+    <p class="relative z-10 text-center text-[11.5px] text-platinum/60 pb-6 px-6">&copy; {year} {c.copyright}</p>
+  </div>
+</section>
+
+<style>
+  /* ---------- چیدمان اصلی ---------- */
+  .contact-media {
+    position: relative;
+    aspect-ratio: 4 / 3.3;
+    overflow: hidden;
+  }
+  .contact-img {
+    object-position: 60% center;
+  }
+  .contact-media-fade {
+    background: linear-gradient(180deg, transparent 50%, #0b0b0b 100%);
+  }
+  .contact-content {
+    padding: 2rem 1.25rem 3.5rem;
+  }
+  @media (min-width: 1024px) {
+    .contact-main {
+      min-height: clamp(720px, 92vh, 900px);
+      display: flex;
+      align-items: center;
+    }
+    .contact-media {
+      position: absolute;
+      inset-block: 0;
+      inset-inline-end: 0;
+      width: 52%;
+      aspect-ratio: auto;
+    }
+    .contact-media-fade {
+      background:
+        linear-gradient(90deg, #0b0b0b 0%, rgba(11, 11, 11, 0.85) 14%, rgba(11, 11, 11, 0.25) 42%, transparent 70%),
+        linear-gradient(180deg, transparent 75%, #0b0b0b 100%);
+    }
+    :global([dir='rtl']) .contact-media-fade {
+      background:
+        linear-gradient(270deg, #0b0b0b 0%, rgba(11, 11, 11, 0.85) 14%, rgba(11, 11, 11, 0.25) 42%, transparent 70%),
+        linear-gradient(180deg, transparent 75%, #0b0b0b 100%);
+    }
+    .contact-content {
+      width: 100%;
+      padding: 5rem 2.5rem 5rem 5.5vw;
+      max-width: min(58rem, 62vw);
+    }
+    :global([dir='rtl']) .contact-content {
+      padding: 5rem 5.5vw 5rem 2.5rem;
+    }
+    .ct-info {
+      border-inline-start: 1px solid rgba(255, 255, 255, 0.12);
+    }
+  }
+
+  /* سه قدم با جداکننده‌ی طلایی */
+  @media (min-width: 640px) {
+    .ct-step + .ct-step {
+      border-inline-start: 1px solid rgba(212, 175, 55, 0.45);
+    }
+  }
+
+  /* ---------- فیلدهای فرم ---------- */
+  .ct-field {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    padding: 0 0.95rem;
+    min-height: 2.9rem;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    background: rgba(255, 255, 255, 0.015);
+    color: #b9bdc5;
+    transition: border-color 0.25s ease, box-shadow 0.25s ease, background-color 0.25s ease;
+  }
+  .ct-field > svg:first-child {
+    width: 1.15rem;
+    height: 1.15rem;
+    flex-shrink: 0;
+    color: #e6c878;
+  }
+  .ct-field input,
+  .ct-field select,
+  .ct-field textarea {
+    flex: 1;
+    min-width: 0;
+    background: transparent;
+    border: 0;
+    outline: 0;
+    color: #f7f6f2;
+    font: inherit;
+    font-size: 14px;
+    padding: 0.75rem 0;
+  }
+  .ct-field input::placeholder,
+  .ct-field textarea::placeholder {
+    color: rgba(247, 246, 242, 0.62);
+  }
+  :global([dir='rtl']) .ct-field input[dir='ltr']::placeholder {
+    text-align: right;
+  }
+  .ct-select select {
+    appearance: none;
+    cursor: pointer;
+    color: rgba(247, 246, 242, 0.62);
+  }
+  .ct-select select.has-value {
+    color: #f7f6f2;
+  }
+  .ct-select option {
+    background: #151515;
+    color: #f7f6f2;
+  }
+  .ct-chevron {
+    width: 1rem;
+    height: 1rem;
+    pointer-events: none;
+    color: #e6c878;
+  }
+  .ct-textarea {
+    align-items: flex-start;
+    padding-top: 0.15rem;
+  }
+  .ct-textarea > svg:first-child {
+    margin-top: 0.8rem;
+  }
+  .ct-textarea textarea {
+    resize: vertical;
+    min-height: 5.2rem;
+  }
+  .ct-field:focus-within {
+    border-color: rgba(212, 175, 55, 0.75);
+    background: rgba(212, 175, 55, 0.04);
+    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.12);
+  }
+  .ct-field.is-invalid {
+    border-color: rgba(230, 110, 90, 0.8);
+  }
+  .ct-send {
+    background: linear-gradient(135deg, #f3e6b3, #e2bf6a 55%, #d4af37);
+    box-shadow: 0 10px 30px -12px rgba(212, 175, 55, 0.6);
+    transition: transform 0.3s ease, box-shadow 0.3s ease, filter 0.3s ease;
+  }
+  .ct-send:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.05);
+    box-shadow: 0 16px 36px -12px rgba(212, 175, 55, 0.75);
+  }
+  .ct-send .ct-arrow {
+    transition: translate 0.3s ease;
+  }
+  .ct-send:hover .ct-arrow {
+    translate: 4px 0;
+  }
+  :global([dir='rtl']) .ct-arrow {
+    transform: scaleX(-1);
+  }
+  :global([dir='rtl']) .ct-send:hover .ct-arrow {
+    translate: -4px 0;
+  }
+  .ct-info-ic {
+    width: 1.75rem;
+    height: 1.75rem;
+    flex-shrink: 0;
+    color: #e6c878;
+  }
+
+  /* ---------- نوار پایانی ---------- */
+  .contact-strip {
+    background:
+      radial-gradient(ellipse 30% 90% at 78% 60%, rgba(212, 175, 55, 0.07), transparent 70%),
+      radial-gradient(ellipse 50% 120% at 20% 100%, rgba(11, 31, 58, 0.35), transparent 70%),
+      #0a0a0b;
+  }
+  .ct-strip-inner {
+    display: grid;
+    gap: 2rem;
+    justify-items: center;
+    padding: 2.5rem 1.25rem 1.5rem;
+  }
+  .ct-stat + .ct-stat {
+    border-inline-start: 1px solid rgba(212, 175, 55, 0.45);
+  }
+  .ct-route {
+    width: min(100% - 3rem, 360px);
+    height: 108px;
+  }
+  .ct-region {
+    position: absolute;
+    transform: translateX(-50%);
+    font-size: 10.5px;
+    line-height: 1.35;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(247, 246, 242, 0.85);
+    max-width: 6.5rem;
+    text-align: center;
+  }
+  @media (min-width: 1024px) {
+    .ct-region {
+      font-size: 11.5px;
+      letter-spacing: 0.12em;
+      max-width: 8rem;
+    }
+  }
+  .ct-region-main {
+    color: #e6c878;
+    font-weight: 500;
+  }
+  .ct-pulse {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: ct-pulse 2.6s ease-out infinite;
+  }
+  @keyframes ct-pulse {
+    0% { transform: scale(0.6); opacity: 0.55; }
+    100% { transform: scale(2.2); opacity: 0; }
+  }
+  @media (min-width: 1024px) {
+    .ct-strip-inner {
+      grid-template-columns: auto auto 1fr;
+      align-items: center;
+      justify-items: start;
+      gap: 3rem;
+      padding: 2.4rem 4vw 1.2rem 5.5vw;
+    }
+    .ct-route {
+      justify-self: end;
+      width: 400px;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .ct-pulse { animation: none; }
+    .ct-send, .ct-send .ct-arrow { transition: none; }
+  }
+</style>
+
+<script>
+  import gsap from 'gsap';
+
+  function initContact() {
+    const section = document.querySelector('.contact-sec') as HTMLElement | null;
+    if (!section || section.dataset.inited) return;
+    section.dataset.inited = '1';
+
+    // ---------- فرم: فعلاً بک‌اند نداریم، پس پیام آماده تو برنامه‌ی ایمیل کاربر باز می‌شه ----------
+    const form = section.querySelector('.ct-form') as HTMLFormElement | null;
+    const select = form?.querySelector('select');
+    select?.addEventListener('change', () => select.classList.toggle('has-value', !!select.value));
+    form?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      let ok = true;
+      form.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>('[required]').forEach((el) => {
+        const valid = el.value.trim() !== '' && (el.type !== 'email' || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(el.value.trim()));
+        el.closest('.ct-field')?.classList.toggle('is-invalid', !valid);
+        if (!valid && ok) {
+          el.focus();
+          ok = false;
+        }
+      });
+      if (!ok) return;
+      const fd = new FormData(form);
+      const subject = `${fd.get('type') || 'Inquiry'} — ${fd.get('name')}`;
+      const body = [`Name: ${fd.get('name')}`, `Email: ${fd.get('email')}`, `Phone: ${fd.get('phone') || '-'}`, `Project type: ${fd.get('type') || '-'}`, '', `${fd.get('message')}`].join('\n');
+      window.location.href = `mailto:${form.dataset.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+      form.querySelector('.ct-status')?.classList.remove('hidden');
+    });
+    // از کارت حوزه/پروژه اومدن → «نوع پروژه» خودکار انتخاب می‌شه
+    document.querySelectorAll<HTMLElement>('[data-project-type]').forEach((link) =>
+      link.addEventListener('click', () => {
+        const idx = parseInt(link.dataset.projectType || '', 10);
+        if (!select || Number.isNaN(idx)) return;
+        const opt = select.options[idx + 1];
+        if (opt) {
+          select.value = opt.value;
+          select.classList.add('has-value');
+        }
+      })
+    );
+    form?.querySelectorAll('input, textarea').forEach((el) =>
+      el.addEventListener('input', () => el.closest('.ct-field')?.classList.remove('is-invalid'))
+    );
+
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    import('gsap/ScrollTrigger').then(({ ScrollTrigger }) => {
+      gsap.registerPlugin(ScrollTrigger);
+      const isRtl = document.documentElement.dir === 'rtl';
+
+      gsap.timeline({ defaults: { ease: 'power3.out' }, scrollTrigger: { trigger: section, start: 'top 72%', once: true } })
+        .from(section.querySelector('.ct-rule'), { scaleX: 0, transformOrigin: isRtl ? 'right center' : 'left center', duration: 0.8 }, 0)
+        .from(section.querySelectorAll('.ct-line-inner'), { yPercent: 165, duration: 1.1, stagger: 0.12, ease: 'expo.out' }, 0.1)
+        .from(section.querySelectorAll('.ct-reveal'), { opacity: 0, y: 24, duration: 0.9, stagger: 0.12 }, 0.25)
+        .from(section.querySelectorAll('.ct-info li'), { opacity: 0, x: isRtl ? -16 : 16, duration: 0.6, stagger: 0.1 }, 0.8);
+
+      const img = section.querySelector('.contact-img');
+      if (img) {
+        gsap.fromTo(img, { scale: 1.14 }, { scale: 1, ease: 'none', scrollTrigger: { trigger: section, start: 'top bottom', end: 'center top', scrub: true } });
+      }
+
+      // نوار پایانی: کمان‌ها کشیده می‌شن
+      const arcs = section.querySelectorAll<SVGPathElement>('.ct-arc');
+      arcs.forEach((a) => {
+        const len = a.getTotalLength();
+        gsap.set(a, { strokeDasharray: len, strokeDashoffset: len });
+      });
+      gsap.timeline({ scrollTrigger: { trigger: section.querySelector('.contact-strip'), start: 'top 92%', once: true } })
+        .to(arcs, { strokeDashoffset: 0, duration: 1.2, stagger: 0.25, ease: 'power2.inOut' }, 0)
+        .from(section.querySelectorAll('.ct-stat, .ct-logo, .ct-region'), { opacity: 0, y: 14, duration: 0.7, stagger: 0.08, ease: 'power3.out' }, 0);
+    });
+  }
+
+  document.addEventListener('astro:page-load', initContact);
+</script>

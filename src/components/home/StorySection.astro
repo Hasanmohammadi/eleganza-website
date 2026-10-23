@@ -1,0 +1,349 @@
+---
+import type { HomeContent } from '../../i18n/home';
+import type { Locale } from '../../i18n/translations';
+
+interface Props {
+  h: HomeContent;
+  lang: Locale;
+}
+const { h, lang } = Astro.props;
+const isLatin = lang === 'en';
+const st = h.story;
+
+// آیکون آمارها: کلاه ایمنی، ساختمان، تیم، دست‌دادن
+const statIcons = [
+  '<path d="M3 17h18"/><path d="M4 17v-1a8 8 0 0 1 16 0v1"/><path d="M10 8.3V5.5a2 2 0 0 1 4 0v2.8"/><path d="M3.5 17v2h17v-2"/>',
+  '<rect x="5" y="3" width="10" height="18" rx="0.5"/><path d="M15 9h4v12h-4"/><path d="M8 7h1M11 7h1M8 10.5h1M11 10.5h1M8 14h1M11 14h1"/><path d="M9 21v-3h2v3"/><path d="M3 21h18"/>',
+  '<circle cx="12" cy="7.5" r="2.6"/><path d="M7.5 19v-1.5a4.5 4.5 0 0 1 9 0V19"/><circle cx="5.2" cy="9.5" r="2"/><path d="M2 18v-1a3.3 3.3 0 0 1 4.6-3"/><circle cx="18.8" cy="9.5" r="2"/><path d="M22 18v-1a3.3 3.3 0 0 0-4.6-3"/>',
+  '<path d="m11 17 2 2a1.4 1.4 0 0 0 2-2"/><path d="m14 14 2.5 2.5a1.4 1.4 0 0 0 2-2l-3.9-3.9a2 2 0 0 0-2.8 0l-.9.9a1.4 1.4 0 0 1-2-2l2.8-2.8a3.2 3.2 0 0 1 3.8-.5l.5.3a2.2 2.2 0 0 0 1.4.3H21"/><path d="m21 14-1.6 1.6"/><path d="M3 7h3.2a2 2 0 0 1 1.4.6L10 10"/><path d="m3 14 5.5 5.5a1.4 1.4 0 0 0 2-2"/>',
+];
+---
+
+<!-- سکشن چهارم: داستان ما — عکس بزرگ + متن + آمار + تایم‌لاین -->
+<section id="story" class="story-sec relative overflow-hidden bg-[#0b0b0b]">
+  <div class="story-grid">
+    <!-- عکس -->
+    <div class="story-media relative overflow-hidden">
+      <img src="/mock/story.jpg" width="736" height="941" alt="" loading="lazy" decoding="async" class="story-img absolute inset-0 w-full h-full object-cover" />
+      <div class="story-media-fade absolute inset-0 pointer-events-none"></div>
+    </div>
+
+    <!-- پنل تیره -->
+    <div class="story-panel relative">
+      <!-- کوه‌های خط‌طلایی (تزئینی) -->
+      <img src="/mock/story-mountains.jpg" alt="" aria-hidden="true" loading="lazy" decoding="async" class="story-mountains pointer-events-none absolute bottom-0 end-0" />
+
+      <div class="story-cols relative z-10">
+        <!-- ستون متن -->
+        <div class="story-main">
+          <div class="story-reveal flex items-center gap-4 mb-6 md:mb-7">
+            <span class="story-rule block h-px w-12 md:w-16 bg-gold/80 shrink-0"></span>
+            <span class={`text-[11px] md:text-[13px] font-medium text-gold-light ${isLatin ? 'uppercase tracking-[0.3em]' : ''}`}>{st.eyebrow}</span>
+          </div>
+
+          <h2 class="story-title font-display text-warmwhite text-[2.4rem] leading-[1.08] sm:text-6xl">
+            <span class="sto-line line-mask block"><span class="sto-line-inner block">{st.title}</span></span>
+            <span class="sto-line line-mask block">
+              <span class="sto-line-inner block bg-clip-text text-transparent" style="background-image: linear-gradient(100deg, #F3E6B3 0%, #E6C878 45%, #D4AF37 100%);">{st.highlight}</span>
+            </span>
+          </h2>
+
+          <p class="story-reveal mt-6 text-warmwhite/90 text-base md:text-lg leading-[1.6] max-w-[36rem]">{st.lead}</p>
+          <p class="story-reveal mt-6 text-platinum text-[0.92rem] md:text-[0.98rem] leading-[1.7] max-w-[37rem]">{st.body}</p>
+
+          <!-- آمار -->
+          <div class="story-stats mt-10 md:mt-12 grid grid-cols-2 lg:grid-cols-4">
+            {st.stats.map((s, i) => {
+              const numeric = /^\d+\+?$/.test(s.value);
+              return (
+                <div class="story-stat flex flex-col items-center text-center px-3 py-5 lg:px-2 lg:py-1">
+                  <svg viewBox="0 0 24 24" class="w-8 h-8 md:w-9 md:h-9 text-gold mb-3" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" set:html={statIcons[i]} aria-hidden="true" />
+                  <span
+                    class={numeric || !isLatin ? 'story-num text-gold-light text-[2.1rem] lg:text-[2rem] xl:text-[2.3rem] leading-none font-medium' : 'story-num font-display text-gold-light text-[1.7rem] lg:text-[1.45rem] xl:text-[1.75rem] leading-[1.15] whitespace-nowrap'}
+                    data-count={numeric ? s.value : undefined}
+                  >{s.value}</span>
+                  <span class="mt-3 text-[12.5px] lg:text-[12px] xl:text-[13px] leading-[1.5] text-platinum">{s.label}<br />{s.sub}</span>
+                </div>
+              );
+            })}
+          </div>
+
+          <a href="#projects" class={`story-reveal story-cta group mt-10 md:mt-12 inline-flex items-center gap-4 px-7 py-3.5 rounded-full border border-gold/70 text-gold-light text-[12px] md:text-[13px] font-medium ${isLatin ? 'uppercase tracking-[0.22em]' : ''}`}>
+            <span>{st.cta}</span>
+            <svg class="story-arrow w-4 h-4 transition-transform duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+          </a>
+        </div>
+
+        <!-- تایم‌لاین -->
+        <ol class="story-timeline relative">
+          <span class="story-track absolute top-2 bottom-2 w-px" aria-hidden="true"></span>
+          <span class="story-track-fill absolute top-2 bottom-2 w-px" aria-hidden="true"></span>
+          {st.timeline.map((t) => (
+            <li class="story-event relative">
+              <span class="story-dot absolute" aria-hidden="true"><span></span></span>
+              <span class="block font-display text-gold-light text-2xl md:text-[1.7rem] leading-none">{t.year}</span>
+              <span class="block mt-2 text-[13.5px] md:text-sm leading-[1.6] text-warmwhite/85 max-w-[15rem]">{t.text}</span>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* ---------- موبایل ---------- */
+  .story-media {
+    aspect-ratio: 4 / 3.4;
+  }
+  .story-img {
+    object-position: center 40%;
+  }
+  .story-media-fade {
+    background: linear-gradient(180deg, transparent 55%, #0b0b0b 100%);
+  }
+  .story-panel {
+    background:
+      radial-gradient(ellipse 60% 50% at 40% 20%, rgba(212, 175, 55, 0.05), transparent 70%),
+      radial-gradient(ellipse 70% 50% at 60% 105%, rgba(11, 31, 58, 0.3), transparent 70%),
+      #0b0b0b;
+    padding: 2.5rem 1.5rem 4rem;
+  }
+  .story-mountains {
+    width: 100%;
+    max-width: 44rem;
+    opacity: 0.55;
+    mix-blend-mode: screen;
+    -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 45%), linear-gradient(90deg, transparent 0%, #000 35%);
+    -webkit-mask-composite: source-in;
+    mask-image: linear-gradient(180deg, transparent 0%, #000 45%), linear-gradient(90deg, transparent 0%, #000 35%);
+    mask-composite: intersect;
+  }
+  :global([dir='rtl']) .story-mountains {
+    -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 45%), linear-gradient(270deg, transparent 0%, #000 35%);
+    mask-image: linear-gradient(180deg, transparent 0%, #000 45%), linear-gradient(270deg, transparent 0%, #000 35%);
+  }
+  .story-cols {
+    display: grid;
+    gap: 3.5rem;
+  }
+  .story-stat + .story-stat {
+    position: relative;
+  }
+  /* جداکننده‌های آمار: موبایل شبکه‌ی ۲×۲ */
+  .story-stats {
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
+  }
+  .story-stat {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  }
+  .story-stat:nth-child(odd) {
+    border-inline-end: 1px solid rgba(255, 255, 255, 0.07);
+  }
+
+  /* تایم‌لاین */
+  .story-timeline {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    padding-inline-start: 2.6rem;
+    display: grid;
+    gap: 2.1rem;
+  }
+  .story-track,
+  .story-track-fill {
+    inset-inline-start: 0.62rem;
+  }
+  .story-track {
+    background: rgba(212, 175, 55, 0.22);
+  }
+  .story-track-fill {
+    background: linear-gradient(180deg, #f3e6b3, #d4af37);
+    transform-origin: top;
+  }
+  .story-dot {
+    inset-inline-start: -2.6rem;
+    top: 0.05rem;
+    width: 1.25rem;
+    height: 1.25rem;
+    border-radius: 9999px;
+    border: 1px solid rgba(243, 230, 179, 0.85);
+    background: #0b0b0b;
+    display: grid;
+    place-items: center;
+    box-shadow: 0 0 14px rgba(212, 175, 55, 0.35);
+  }
+  .story-dot > span {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 9999px;
+    background: #f3e6b3;
+    box-shadow: 0 0 8px rgba(243, 230, 179, 0.9);
+  }
+
+  .story-cta {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+  }
+  .story-cta:hover {
+    background: linear-gradient(135deg, #f3e6b3, #d4af37);
+    color: #111;
+    border-color: transparent;
+  }
+  .story-cta:hover .story-arrow {
+    translate: 4px 0;
+  }
+  :global([dir='rtl']) .story-arrow {
+    transform: scaleX(-1);
+  }
+  :global([dir='rtl']) .story-cta:hover .story-arrow {
+    translate: -4px 0;
+  }
+
+  /* ---------- دسکتاپ ---------- */
+  @media (min-width: 1024px) {
+    .story-grid {
+      display: grid;
+      grid-template-columns: 40% 60%;
+      min-height: clamp(640px, 100vh, 980px);
+    }
+    .story-media {
+      aspect-ratio: auto;
+    }
+    .story-media-fade {
+      background: linear-gradient(90deg, transparent 78%, rgba(11, 11, 11, 0.6) 100%);
+    }
+    :global([dir='rtl']) .story-media-fade {
+      background: linear-gradient(270deg, transparent 78%, rgba(11, 11, 11, 0.6) 100%);
+    }
+    .story-panel {
+      display: flex;
+      align-items: center;
+      padding: 6rem 2.5rem 7rem 3rem;
+    }
+    .story-cols {
+      width: 100%;
+      grid-template-columns: minmax(0, 1fr) 13.5rem;
+      gap: 2.5rem;
+      align-items: start;
+    }
+    .story-title {
+      font-size: clamp(2.8rem, 3.7vw, 5rem);
+    }
+    .sto-line-inner {
+      white-space: nowrap;
+    }
+    .story-stats {
+      border: 0;
+    }
+    .story-stat {
+      border: 0 !important;
+    }
+    .story-stat + .story-stat::before {
+      content: '';
+      position: absolute;
+      inset-inline-start: 0;
+      top: 18%;
+      bottom: 8%;
+      width: 1px;
+      background: rgba(255, 255, 255, 0.1);
+    }
+    .story-timeline {
+      gap: 2.6rem;
+      padding-top: 0.2rem;
+    }
+  }
+  @media (min-width: 1536px) {
+    .story-grid {
+      grid-template-columns: 44% 56%;
+    }
+    .story-panel {
+      padding-inline: 3.5rem 4rem;
+    }
+    .story-cols {
+      grid-template-columns: minmax(0, 1fr) 15rem;
+      gap: 3.5rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .story-cta,
+    .story-arrow {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  import gsap from 'gsap';
+
+  function initStory() {
+    const section = document.querySelector('.story-sec') as HTMLElement | null;
+    if (!section || section.dataset.inited) return;
+    section.dataset.inited = '1';
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    import('gsap/ScrollTrigger').then(({ ScrollTrigger }) => {
+      gsap.registerPlugin(ScrollTrigger);
+      const isRtl = document.documentElement.dir === 'rtl';
+
+      // عکس: پرده از کنار + زوم آرام با اسکرول
+      const media = section.querySelector('.story-media') as HTMLElement | null;
+      const img = section.querySelector('.story-img');
+      if (media) {
+        gsap.from(media, {
+          clipPath: isRtl ? 'inset(0 0 0 100%)' : 'inset(0 100% 0 0)',
+          duration: 1.5,
+          ease: 'expo.inOut',
+          clearProps: 'clipPath',
+          scrollTrigger: { trigger: section, start: 'top 75%', once: true },
+        });
+      }
+      if (img) {
+        gsap.fromTo(img, { scale: 1.15 }, { scale: 1, ease: 'none', scrollTrigger: { trigger: section, start: 'top bottom', end: 'bottom top', scrub: true } });
+      }
+
+      // متن
+      gsap.timeline({ defaults: { ease: 'power3.out' }, scrollTrigger: { trigger: section.querySelector('.story-main'), start: 'top 78%', once: true } })
+        .from(section.querySelector('.story-rule'), { scaleX: 0, transformOrigin: isRtl ? 'right center' : 'left center', duration: 0.8 }, 0)
+        .from(section.querySelectorAll('.sto-line-inner'), { yPercent: 165, duration: 1.1, stagger: 0.12, ease: 'expo.out' }, 0.1)
+        .from(section.querySelectorAll('.story-reveal'), { opacity: 0, y: 22, duration: 0.9, stagger: 0.12 }, 0.25);
+
+      // آمار: ظاهرشدن + شمارش اعداد
+      const stats = section.querySelectorAll<HTMLElement>('.story-stat');
+      gsap.from(stats, {
+        opacity: 0,
+        y: 26,
+        duration: 0.8,
+        stagger: 0.12,
+        ease: 'power3.out',
+        scrollTrigger: { trigger: section.querySelector('.story-stats'), start: 'top 85%', once: true },
+        onStart: () => {
+          section.querySelectorAll<HTMLElement>('[data-count]').forEach((el) => {
+            const raw = el.dataset.count || '0';
+            const target = parseInt(raw, 10);
+            const suffix = raw.replace(/\d/g, '');
+            const c = { v: 0 };
+            gsap.to(c, { v: target, duration: 1.6, ease: 'power2.out', onUpdate: () => (el.textContent = `${Math.round(c.v)}${suffix}`) });
+          });
+        },
+      });
+
+      // تایم‌لاین: خط پر می‌شه، نقطه‌ها و سال‌ها یکی‌یکی
+      const timeline = section.querySelector('.story-timeline');
+      if (timeline) {
+        gsap.timeline({ scrollTrigger: { trigger: timeline, start: 'top 80%', once: true } })
+          .from(timeline.querySelector('.story-track-fill'), { scaleY: 0, duration: 1.8, ease: 'power2.inOut' }, 0)
+          .from(timeline.querySelectorAll('.story-dot'), { scale: 0, duration: 0.5, stagger: 0.32, ease: 'back.out(2.5)' }, 0.1)
+          .from(timeline.querySelectorAll('.story-event > span:not(.story-dot)'), { opacity: 0, x: isRtl ? -18 : 18, duration: 0.7, stagger: 0.16, ease: 'power3.out' }, 0.2);
+      }
+
+      // کوه‌ها: کمی پارالاکس
+      const mtn = section.querySelector('.story-mountains');
+      if (mtn) {
+        gsap.fromTo(mtn, { yPercent: 12, opacity: 0 }, { yPercent: 0, opacity: 0.55, ease: 'none', scrollTrigger: { trigger: section, start: 'top 80%', end: 'bottom bottom', scrub: true } });
+      }
+    });
+  }
+
+  document.addEventListener('astro:page-load', initStory);
+</script>

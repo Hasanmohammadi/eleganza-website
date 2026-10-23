@@ -12,7 +12,6 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
 const files = [
   { pkg: 'gsap', from: 'node_modules/gsap/dist/gsap.min.js', to: 'public/vendor/gsap.min.js' },
-  { pkg: 'scrolly-video', from: 'node_modules/scrolly-video/dist/scrolly-video.js', to: 'public/vendor/scrolly-video.js' },
 ];
 
 let missing = 0;

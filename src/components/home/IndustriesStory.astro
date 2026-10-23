@@ -24,134 +24,216 @@ const positions = h.industries.items.map((item, i) => {
   return { ...item, x, y, angle: angleDeg, icon: icons[i] };
 });
 
-// آماری که تو صحنه‌ی سوم بزرگ نمایش داده می‌شه
-const spotlightStat = h.stats[1]; // "15+ Years of combined expertise"
+// عدد صحنه‌ی آمار: همون «۹+ سال تجربه در عمان» که بقیه‌ی سایت هم می‌گه
+const spot = h.story.stats[0];
+const spotlightStat = { value: spot.value, label: `${spot.label} ${spot.sub}` };
 ---
 
-<section id="industries" class="story-section relative" style="height: 400vh;">
-  <div class="story-pin sticky top-0 h-screen w-full overflow-hidden flex items-center justify-center bg-navy/25 border-y border-platinum/10 pt-16 md:pt-20">
-    <!-- هاله‌ی پس‌زمینه‌ی ثابت -->
-    <div class="pointer-events-none absolute inset-0" style="background: radial-gradient(ellipse 60% 50% at 50% 50%, rgba(212,175,55,0.08), transparent 70%);"></div>
+<!-- این کامپوننت داخل هیرو (Hero.astro) و داخل .hero-pin رندر می‌شه؛ خودش سکشن جدا نیست -->
+<div class="story-root contents">
+  <!-- نشانگر پیشرفت (هیرو + ۳ صحنه) -->
+  <div class="story-progress absolute bottom-8 md:bottom-10 inset-x-0 flex justify-center gap-2.5 z-20 pointer-events-none">
+    <span class="story-dot w-1.5 h-1.5 rounded-full bg-platinum/30"></span>
+    <span class="story-dot w-1.5 h-1.5 rounded-full bg-platinum/30"></span>
+    <span class="story-dot w-1.5 h-1.5 rounded-full bg-platinum/30"></span>
+    <span class="story-dot w-1.5 h-1.5 rounded-full bg-platinum/30"></span>
+  </div>
 
-    <!-- نشانگر پیشرفت داستان (۴ نقطه) -->
-    <div class="story-progress absolute bottom-8 md:bottom-10 inset-x-0 flex justify-center gap-2.5 z-20">
-      <span class="story-dot w-1.5 h-1.5 rounded-full bg-platinum/30"></span>
-      <span class="story-dot w-1.5 h-1.5 rounded-full bg-platinum/30"></span>
-      <span class="story-dot w-1.5 h-1.5 rounded-full bg-platinum/30"></span>
-      <span class="story-dot w-1.5 h-1.5 rounded-full bg-platinum/30"></span>
-    </div>
-
-    <!-- صحنه ۱: چشم‌انداز -->
-    <div class="story-scene story-scene-1 absolute inset-0 flex flex-col items-center justify-center text-center px-6">
-      <img src="/brand/logo-icon.png" alt="" class="w-16 sm:w-20 mb-6 opacity-90" />
-      <h2 class="font-display text-2xl sm:text-4xl md:text-5xl text-warmwhite max-w-xl">
-        {h.industries.sectionTitle}
-      </h2>
-      <p class="mt-4 text-platinum text-sm sm:text-base max-w-md">{h.industries.sectionSubtitle}</p>
-    </div>
-
-    <!-- صحنه ۲: شش حوزه‌ی فعالیت دور نشان -->
-    <div class="story-scene story-scene-2 absolute inset-0 flex items-center justify-center px-6">
-      <div class="relative w-[280px] h-[280px] sm:w-[420px] sm:h-[420px] md:w-[480px] md:h-[480px]">
-        <!-- نشان مرکزی -->
-        <div class="absolute inset-0 flex items-center justify-center">
-          <img src="/brand/logo-icon.png" alt="" class="w-12 sm:w-16 opacity-80" />
-        </div>
-        <!-- خطوط اتصال از مرکز به هر آیکون -->
-        <svg viewBox="0 0 100 100" class="absolute inset-0 w-full h-full overflow-visible" preserveAspectRatio="none">
+  <!-- صحنه ۲: صورت فلکیِ شش حوزه — مدار چرخان، پالس نور روی خطوط، آیکون‌های شیشه‌ای -->
+  <div class="story-scene pointer-events-none z-10 story-scene-2 absolute inset-0 flex items-center justify-center px-6">
+    <div class="orbit-stage relative w-[300px] h-[300px] sm:w-[440px] sm:h-[440px] md:w-[480px] md:h-[480px] shrink-0 lg:w-[min(54vw,88vh)] lg:h-[min(54vw,88vh)] xl:w-[min(54vw,90vh)] xl:h-[min(54vw,90vh)]">
+      <!-- هاله‌ی ملایم پشت نشان -->
+      <div class="orbit-glow absolute inset-[22%] rounded-full"></div>
+      <!-- کل مدار (با اسکرول می‌چرخه؛ آیکون‌ها خلاف جهت می‌چرخن تا صاف بمونن) -->
+      <div class="story-orbit absolute inset-0">
+        <svg viewBox="0 0 100 100" class="absolute inset-0 w-full h-full overflow-visible" aria-hidden="true">
+          <defs>
+            <filter id="orbit-soft-glow" x="-200%" y="-200%" width="500%" height="500%">
+              <feGaussianBlur stdDeviation="0.9" />
+            </filter>
+          </defs>
+          <!-- حلقه‌های تزئینی -->
+          <g class="orbit-deco">
+            <circle cx="50" cy="50" r="46" fill="none" stroke="#D4AF37" stroke-opacity="0.16" stroke-width="0.15" />
+            <circle cx="50" cy="50" r="22" fill="none" stroke="#D4AF37" stroke-opacity="0.12" stroke-width="0.15" />
+          </g>
+          <!-- حلقه‌ی اصلی که با اسکرول کشیده می‌شه -->
+          <circle class="orbit-ring" cx="50" cy="50" r="34" fill="none" stroke="#D4AF37" stroke-opacity="0.6" stroke-width="0.3" pathLength="1" transform="rotate(-90 50 50)" />
+          <!-- خطوط اتصال -->
           {positions.map((p) => (
-            <line
-              class="story-line"
-              x1="50"
-              y1="50"
-              x2={p.x}
-              y2={p.y}
-              stroke="#D4AF37"
-              stroke-opacity="0.3"
-              stroke-width="0.3"
-            />
+            <line class="story-line" x1="50" y1="50" x2={p.x} y2={p.y} stroke="#D4AF37" stroke-opacity="0.4" stroke-width="0.3" pathLength="1" />
           ))}
+          <!-- ذره‌های نورانی که روی خطوط می‌دوئن -->
+          <g class="story-pulses">
+            {positions.map((p, i) => (
+              <g>
+                <circle r="1.2" fill="#F3E6B3" filter="url(#orbit-soft-glow)">
+                  <animateMotion dur="3.2s" begin={`${(i * 0.53).toFixed(2)}s`} repeatCount="indefinite" path={`M50 50 L${p.x} ${p.y}`} keyTimes="0;1" calcMode="spline" keySplines="0.4 0 0.2 1" />
+                  <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.15;0.8;1" dur="3.2s" begin={`${(i * 0.53).toFixed(2)}s`} repeatCount="indefinite" />
+                </circle>
+              </g>
+            ))}
+          </g>
         </svg>
-        <!-- آیکون‌های شش‌گانه -->
-        {positions.map((p) => (
+
+        <!-- گره‌ها: شیشه‌ای، با آیکونِ خط‌کشی‌شونده -->
+        {positions.map((p, i) => (
           <div
-            class="story-icon absolute flex flex-col items-center gap-1.5 -translate-x-1/2 -translate-y-1/2"
+            class="story-icon story-node absolute pointer-events-auto"
             style={`left:${p.x}%; top:${p.y}%`}
             data-angle={p.angle}
+            data-index={i}
           >
-            <span class="flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-charcoal border border-gold/50 text-gold">
-              <svg viewBox="0 0 24 24" class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" set:html={p.icon} />
-            </span>
-            <span class="text-[10px] sm:text-xs text-platinum whitespace-nowrap">{p.title}</span>
+            <div class="story-node-rot">
+              <div class="story-node-float flex flex-col items-center gap-2">
+                <span class="node-icon relative flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 lg:w-[4.8rem] lg:h-[4.8rem] rounded-full text-gold">
+                  <svg viewBox="0 0 24 24" class="relative w-5 h-5 sm:w-6 sm:h-6 lg:w-8 lg:h-8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" set:html={p.icon} />
+                </span>
+                <span class="node-label text-[11px] sm:text-[13px] lg:text-base text-warmwhite whitespace-nowrap">{p.title}</span>
+              </div>
+            </div>
           </div>
         ))}
       </div>
-    </div>
 
-    <!-- صحنه ۳: آمار برجسته -->
-    <div class="story-scene story-scene-3 absolute inset-0 flex flex-col items-center justify-center text-center px-6">
-      <span class="story-stat-num font-display text-6xl sm:text-8xl md:text-9xl text-transparent bg-clip-text" style="background-image: linear-gradient(120deg, #F3E6B3, #D4AF37);" data-target={spotlightStat.value}>
-        0
-      </span>
-      <span class="mt-3 text-platinum text-sm sm:text-lg tracking-wide">{spotlightStat.label}</span>
-    </div>
-
-    <!-- صحنه ۴: جمع‌بندی و CTA -->
-    <div class="story-scene story-scene-4 absolute inset-0 flex flex-col items-center justify-center text-center px-6">
-      <img src="/brand/logo-icon.png" alt="" class="w-14 sm:w-20 mb-6 opacity-90" />
-      <h2 class="font-display text-2xl sm:text-4xl md:text-5xl text-warmwhite max-w-lg">
-        {h.industries.sectionTitle} — {h.industries.sectionSubtitle}
-      </h2>
-      <a href="#business" class="story-cta relative overflow-hidden mt-8 px-7 py-3 text-sm font-medium tracking-wide text-charcoal">
-        <span class="relative z-10">{h.explore.sectionTitle}</span>
-      </a>
+      <!-- نشان مرکزی (چرخش نداره) -->
+      <div class="orbit-core absolute inset-0 flex items-center justify-center pointer-events-none">
+        <img src="/brand/logo-icon.png" alt="" class="w-14 sm:w-20 lg:w-28" />
+      </div>
     </div>
   </div>
-</section>
+
+  <!-- صحنه ۳: آمار برجسته -->
+  <div class="story-scene pointer-events-none z-10 story-scene-3 absolute inset-0 flex flex-col items-center justify-center text-center px-6">
+    <span class="story-stat-num font-display text-6xl sm:text-8xl md:text-9xl text-transparent bg-clip-text" style="background-image: linear-gradient(120deg, #F3E6B3, #D4AF37);" data-target={spotlightStat.value}>{spotlightStat.value}</span>
+    <span class="mt-3 text-platinum text-sm sm:text-lg tracking-wide">{spotlightStat.label}</span>
+  </div>
+
+  <!-- صحنه ۴: جمع‌بندی و CTA -->
+  <div class="story-scene pointer-events-none z-10 story-scene-4 absolute inset-0 flex flex-col items-center justify-center text-center px-6">
+    <img src="/brand/logo-icon.png" alt="" class="w-14 sm:w-20 mb-6 opacity-90" />
+    <h2 class="font-display text-2xl sm:text-4xl md:text-5xl text-warmwhite max-w-lg">
+      {h.industries.sectionTitle} — {h.industries.sectionSubtitle}
+    </h2>
+    <a href="#industries" class="story-cta pointer-events-auto mt-8 inline-flex items-center gap-3 px-7 py-3.5 rounded-full border border-gold/70 text-gold-light text-[12px] md:text-[13px] font-medium">
+      <span>{h.industryGrid.cta}</span>
+      <svg class="story-cta-arrow w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+    </a>
+  </div>
+</div>
 
 <style>
   .story-scene {
     opacity: 0;
+    text-shadow: 0 2px 22px rgba(0, 0, 0, 0.65);
   }
+  .story-stat-num {
+    text-shadow: none;
+    filter: drop-shadow(0 4px 22px rgba(0, 0, 0, 0.6));
+  }
+  /* دسکتاپ: صحنه‌ها دقیقاً جای لوگو و شعار (ستون سمت چپِ هیرو) می‌شینن؛ left فیزیکیه و برای fa/ar هم همین‌جاست */
+  @media (min-width: 768px) {
+    .story-scene {
+      right: auto;
+      left: calc(2.5rem + 4vw);
+      width: 30rem;
+      padding-inline: 0;
+    }
+  }
+  @media (min-width: 1024px) {
+    .story-scene {
+      left: calc(2.5rem + 7vw);
+      width: 34rem;
+    }
+  }
+  /* ===== صحنه‌ی مدار ===== */
+  .story-scene-2 { visibility: hidden; }
+  /* دسکتاپ بزرگ: مدار ستون پهن‌تری از سمت چپ می‌گیره تا بزرگ‌تر جا بشه */
+  @media (min-width: 1024px) {
+    .story-scene.story-scene-2 {
+      left: 0;
+      width: 60vw;
+    }
+  }
+  .orbit-glow {
+    background: radial-gradient(circle, rgba(212, 175, 55, 0.28), rgba(212, 175, 55, 0.06) 55%, transparent 72%);
+    filter: blur(18px);
+    opacity: 0.8;
+  }
+  .orbit-core img {
+    filter: drop-shadow(0 0 18px rgba(243, 230, 179, 0.55)) drop-shadow(0 0 40px rgba(212, 175, 55, 0.35));
+  }
+
+  .orbit-ring, .story-line {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+  }
+  .story-line {
+    transition: stroke-opacity 0.3s ease, stroke-width 0.3s ease;
+  }
+  .story-line.is-hot {
+    stroke-opacity: 1;
+    stroke-width: 0.7;
+  }
+  .orbit-deco, .story-pulses { opacity: 0; }
+  .story-line { stroke-opacity: 0.5; }
+
+  .node-icon {
+    background: radial-gradient(circle at 30% 25%, rgba(243, 230, 179, 0.22), rgba(13, 13, 13, 0.72) 70%);
+    border: 1px solid rgba(212, 175, 55, 0.55);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.06), 0 8px 28px rgba(0, 0, 0, 0.45), inset 0 0 14px rgba(212, 175, 55, 0.15);
+    transition: transform 0.35s cubic-bezier(0.3, 1.6, 0.5, 1), box-shadow 0.35s ease, border-color 0.35s ease;
+  }
+  .story-node:hover .node-icon {
+    transform: scale(1.22);
+    border-color: #f3e6b3;
+    box-shadow: 0 0 0 6px rgba(212, 175, 55, 0.14), 0 0 34px rgba(212, 175, 55, 0.6), inset 0 0 18px rgba(243, 230, 179, 0.35);
+  }
+  .node-label {
+    padding: 0.2rem 0.65rem;
+    border-radius: 9999px;
+    background: rgba(13, 13, 13, 0.5);
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    text-shadow: none;
+  }
+  .story-node:hover .node-label {
+    border-color: rgba(212, 175, 55, 0.6);
+    color: #f3e6b3;
+  }
+
   .story-cta {
+    background: rgba(11, 11, 11, 0.35);
+    text-shadow: none;
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+  }
+  .story-cta:hover {
     background: linear-gradient(135deg, #f3e6b3, #d4af37);
+    color: #111;
+    border-color: transparent;
   }
-  .story-cta::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(120deg, transparent 30%, rgba(255, 255, 255, 0.55) 50%, transparent 70%);
-    background-size: 250% 100%;
-    background-position: 150% 0;
-  }
-  .story-cta:hover::after {
-    transition: background-position 0.7s ease;
-    background-position: -50% 0;
+  :global([dir='rtl']) .story-cta-arrow {
+    transform: scaleX(-1);
   }
   .story-dot.is-active {
     background-color: #d4af37;
   }
 
-  /* برای کاربرانی که انیمیشن کمتر می‌خوان: بدون pin، ساده و پشت سرهم */
   @media (prefers-reduced-motion: reduce) {
-    .story-section {
-      height: auto !important;
-    }
-    .story-pin {
-      position: static !important;
-      height: auto !important;
-      display: flex;
-      flex-direction: column;
-      gap: 4rem;
-      padding-block: 4rem;
-    }
     .story-scene {
       position: static !important;
       opacity: 1 !important;
+      padding-block: 3rem;
     }
     .story-progress {
       display: none;
     }
+    .story-scene-2 { visibility: visible !important; }
+    .orbit-ring, .story-line { stroke-dashoffset: 0; }
+    .orbit-deco, .story-pulses { opacity: 1; }
   }
 </style>
 
@@ -159,29 +241,36 @@ const spotlightStat = h.stats[1]; // "15+ Years of combined expertise"
   import gsap from 'gsap';
 
   function initIndustriesStory() {
-    const section = document.querySelector('.story-section') as HTMLElement | null;
+    const section = document.querySelector('.hero-section') as HTMLElement | null;
     if (!section) return;
-    if (section.dataset.inited) return;
-    section.dataset.inited = '1';
+    if (section.dataset.storyInited) return;
+    section.dataset.storyInited = '1';
 
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
     import('gsap/ScrollTrigger').then(({ ScrollTrigger }) => {
       gsap.registerPlugin(ScrollTrigger);
 
-      const dots = document.querySelectorAll('.story-dot');
-      const icons = document.querySelectorAll<HTMLElement>('.story-icon');
+      const dots = section.querySelectorAll('.story-dot');
+      const icons = section.querySelectorAll<HTMLElement>('.story-icon');
+      const lines = section.querySelectorAll<SVGLineElement>('.story-line');
 
-      // آیکون‌ها اول وسط دایره (روی نشان مرکزی) قرار می‌گیرن تا موقع ورود «منفجر» بشن بیرون
+      // آیکون‌ها وسط دایره می‌شینن تا موقع ورود «منفجر» بشن بیرون (مرکز‌چینی با xPercent/yPercent)
       icons.forEach((icon) => {
         const angle = (parseFloat(icon.dataset.angle || '0') * Math.PI) / 180;
-        const burst = 70; // فاصله‌ی شروع از مرکز (px)
-        gsap.set(icon, {
-          x: -Math.cos(angle) * burst,
-          y: -Math.sin(angle) * burst,
-          scale: 0.2,
-          opacity: 0,
+        const burst = 90;
+        gsap.set(icon, { xPercent: -50, yPercent: -50, x: -Math.cos(angle) * burst, y: -Math.sin(angle) * burst, scale: 0.15, opacity: 0 });
+
+        // هر آیکون با خط‌کشی ظاهر می‌شه
+        icon.querySelectorAll('.node-icon svg *').forEach((el) => {
+          gsap.set(el, { strokeDasharray: 1, strokeDashoffset: 1 });
+          (el as SVGElement).setAttribute('pathLength', '1');
         });
+
+        // هاور: خطِ همون گره روشن می‌شه
+        const idx = parseInt(icon.dataset.index || '0', 10);
+        icon.addEventListener('mouseenter', () => lines[idx]?.classList.add('is-hot'));
+        icon.addEventListener('mouseleave', () => lines[idx]?.classList.remove('is-hot'));
       });
 
       const tl = gsap.timeline({
@@ -190,7 +279,6 @@ const spotlightStat = h.stats[1]; // "15+ Years of combined expertise"
           start: 'top top',
           end: 'bottom bottom',
           scrub: 0.6,
-          pin: '.story-pin',
           onUpdate: (self) => {
             const idx = Math.min(3, Math.floor(self.progress * 4));
             dots.forEach((d, i) => d.classList.toggle('is-active', i === idx));
@@ -198,26 +286,39 @@ const spotlightStat = h.stats[1]; // "15+ Years of combined expertise"
         },
       });
 
-      // صحنه ۱ → ۲
-      tl.set('.story-scene-1', { opacity: 1 })
-        .to('.story-scene-1', { opacity: 0, duration: 0.6 }, 0.55)
-        .to('.story-scene-2', { opacity: 1, duration: 0.6 }, 0.55)
-        .to(icons, { x: 0, y: 0, scale: 1, opacity: 1, stagger: 0.08, duration: 0.9, ease: 'back.out(2)' }, 0.75)
-        .fromTo('.story-line', { scaleX: 0 }, { scaleX: 1, stagger: 0.08, duration: 0.7, transformOrigin: 'left center' }, 0.75)
-        // صحنه ۲ → ۳
-        .to('.story-scene-2', { opacity: 0, duration: 0.6 }, 2.3)
-        .to('.story-scene-3', { opacity: 1, duration: 0.6 }, 2.3)
-        // صحنه ۳ → ۴
-        .to('.story-scene-3', { opacity: 0, duration: 0.6 }, 3.3)
-        .to('.story-scene-4', { opacity: 1, duration: 0.6 }, 3.3);
+      // لوگو/شعار → شش حوزه
+      tl.to('.hero-scene-0', { autoAlpha: 0, y: -40, duration: 0.6 }, 0.2)
+        .to('.story-scene-2', { autoAlpha: 1, duration: 0.6 }, 0.7)
+        .to('.orbit-deco', { opacity: 1, duration: 1 }, 0.8)
+        .to('.orbit-ring', { strokeDashoffset: 0, duration: 1.3, ease: 'power2.inOut' }, 0.8)
+        .to(icons, { x: 0, y: 0, scale: 1, opacity: 1, stagger: 0.09, duration: 1.1, ease: 'power3.out' }, 0.95)
+        .to('.node-icon svg *', { strokeDashoffset: 0, duration: 0.8, stagger: 0.015, ease: 'power1.inOut' }, 1.15)
+        .to(lines, { strokeDashoffset: 0, stagger: 0.09, duration: 0.9, ease: 'power2.out' }, 1.05)
+        .to('.story-pulses', { opacity: 1, duration: 0.6 }, 1.9)
+        // مدار با اسکرول یک شش‌ضلعی می‌چرخه؛ آیکون‌ها خلاف جهت تا همیشه صاف بمونن
+        .to('.story-orbit', { rotation: 60, ease: 'none', duration: 1.8, transformOrigin: '50% 50%' }, 0.7)
+        .to('.story-node-rot', { rotation: -60, ease: 'none', duration: 1.8 }, 0.7)
+        // شش حوزه → آمار
+        .to('.story-scene-2', { autoAlpha: 0, duration: 0.6 }, 2.5)
+        .to('.story-scene-3', { opacity: 1, duration: 0.6 }, 2.5)
+        // آمار → جمع‌بندی
+        .to('.story-scene-3', { opacity: 0, duration: 0.6 }, 3.5)
+        .to('.story-scene-4', { opacity: 1, duration: 0.6 }, 3.5);
 
-      // شمارش عدد صحنه‌ی ۳ (فقط یک‌بار، وقتی صحنه فعال می‌شه)
-      const statEl = document.querySelector('.story-stat-num') as HTMLElement | null;
+      // شمارش عدد صحنه‌ی آمار (فقط یک‌بار)
+      // ارقام فارسی/عربی هم پشتیبانی می‌شن: «+۱۵» → شمارش با همون ارقام و همون علامت قبل/بعد
+      const statEl = section.querySelector('.story-stat-num') as HTMLElement | null;
       if (statEl) {
         const raw = statEl.dataset.target || '0';
-        const digits = raw.replace(/[^\d]/g, '');
-        const suffix = raw.replace(/[\d]/g, '');
-        const target = parseInt(digits || '0', 10);
+        const FA = '۰۱۲۳۴۵۶۷۸۹';
+        const AR = '٠١٢٣٤٥٦٧٨٩';
+        const script = /[۰-۹]/.test(raw) ? FA : /[٠-٩]/.test(raw) ? AR : null;
+        const ascii = raw.replace(/[۰-۹]/g, (d) => String(FA.indexOf(d))).replace(/[٠-٩]/g, (d) => String(AR.indexOf(d)));
+        const m = ascii.match(/^(\D*)(\d+)(\D*)$/);
+        const prefix = m ? m[1] : '';
+        const suffix = m ? m[3] : '';
+        const target = m ? parseInt(m[2], 10) : 0;
+        const toScript = (n: number) => (script ? String(n).replace(/\d/g, (d) => script[Number(d)]) : String(n));
         let played = false;
 
         ScrollTrigger.create({
@@ -225,7 +326,7 @@ const spotlightStat = h.stats[1]; // "15+ Years of combined expertise"
           start: 'top top',
           end: 'bottom bottom',
           onUpdate: (self) => {
-            if (!played && self.progress > 0.58 && self.progress < 0.85) {
+            if (!played && self.progress > 0.63 && self.progress < 0.85) {
               played = true;
               const counter = { val: 0 };
               gsap.to(counter, {
@@ -233,11 +334,11 @@ const spotlightStat = h.stats[1]; // "15+ Years of combined expertise"
                 duration: 1.4,
                 ease: 'power2.out',
                 onUpdate: () => {
-                  statEl.textContent = `${Math.round(counter.val)}${suffix}`;
+                  statEl.textContent = `${prefix}${toScript(Math.round(counter.val))}${suffix}`;
                 },
               });
             }
-            if (self.progress < 0.5) played = false; // اگه برگشت بالا، دوباره آماده بشه
+            if (self.progress < 0.5) played = false;
           },
         });
       }

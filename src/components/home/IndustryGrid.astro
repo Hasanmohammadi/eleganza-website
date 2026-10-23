@@ -1,0 +1,202 @@
+---
+import type { HomeContent } from '../../i18n/home';
+import type { Locale } from '../../i18n/translations';
+
+interface Props {
+  h: HomeContent;
+  lang: Locale;
+}
+const { h, lang } = Astro.props;
+const isLatin = lang === 'en';
+const g = h.industryGrid;
+
+// عکس‌ها: public/industries/industry-1.jpg … industry-6.jpg
+// (فعلاً موقتی؛ برای عوض‌کردن، فقط فایل با همین اسم رو جایگزین کن)
+const items = g.items.map((item, i) => ({
+  ...item,
+  num: String(i + 1).padStart(2, '0'),
+  image: `/industries/industry-${i + 1}.jpg`,
+}));
+---
+
+<!-- سکشن سوم: شش حوزه — هدر + گرید ۳×۲ کارت‌های عکس‌دار -->
+<section id="industries" class="ind-section relative overflow-hidden py-20 md:py-28">
+  <div class="ind-bg pointer-events-none absolute inset-0"></div>
+
+  <div class="relative max-w-[100rem] mx-auto px-5 md:px-8 xl:px-10">
+    <!-- هدر -->
+    <div class="ind-head grid gap-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end mb-12 md:mb-14 lg:px-12">
+      <div>
+        <div class="ind-reveal flex items-center gap-4 mb-6">
+          <span class="ind-rule block h-px w-12 md:w-16 bg-gold/80 shrink-0"></span>
+          <span class={`text-[11px] md:text-[13px] font-medium text-gold-light ${isLatin ? 'uppercase tracking-[0.3em]' : ''}`}>{g.eyebrow}</span>
+        </div>
+        <h2 class="font-display text-warmwhite text-[2.4rem] leading-[1.08] sm:text-6xl lg:text-7xl">
+          <span class="ind-line line-mask block"><span class="ind-line-inner block">{g.title}</span></span>
+          <span class="ind-line line-mask block">
+            <span class="ind-line-inner block bg-clip-text text-transparent" style="background-image: linear-gradient(100deg, #F3E6B3 0%, #E6C878 45%, #D4AF37 100%);">{g.highlight}</span>
+          </span>
+        </h2>
+        <p class="ind-reveal mt-5 md:mt-6 text-platinum/90 text-[0.95rem] md:text-lg leading-[1.7] max-w-[40rem]">{g.subtitle}</p>
+      </div>
+      <a href="#projects" class={`ind-reveal ind-cta group inline-flex items-center justify-center gap-3 self-start lg:self-end lg:mb-2 px-7 py-3.5 rounded-full border border-gold/70 text-gold-light text-[12px] md:text-[13px] font-medium ${isLatin ? 'uppercase tracking-[0.22em]' : ''}`}>
+        <span>{g.cta}</span>
+        <svg class="ind-arrow w-4 h-4 transition-transform duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+      </a>
+    </div>
+
+    <!-- کارت‌ها -->
+    <div class="ind-grid grid gap-3 md:gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {items.map((item, i) => (
+        <a href="#contact" data-project-type={i} class="ind-card group relative block overflow-hidden rounded-[6px] border border-white/[0.07] bg-[#0f1013]">
+          <div class="ind-media absolute inset-y-0 end-0">
+            <img src={item.image} alt="" loading="lazy" decoding="async" class="ind-img w-full h-full object-cover" />
+          </div>
+          <div class="ind-shade absolute inset-0 pointer-events-none"></div>
+
+          <div class="relative z-10 flex flex-col h-full p-6 md:p-7 lg:p-8">
+            <div class="flex items-center gap-3 text-gold-light text-[13px] md:text-sm" dir="ltr">
+              <span>{item.num}</span>
+              <span class="ind-num-rule block h-px w-10 bg-gold/60 transition-all duration-500"></span>
+            </div>
+            <h3 class="font-display mt-3 text-[1.6rem] md:text-[1.75rem] xl:text-[2rem] leading-[1.12] text-warmwhite">
+              <span class="block">{item.title}</span>
+              <span class="block text-gold-light">{item.highlight}</span>
+            </h3>
+            <p class="mt-4 text-[13px] md:text-[13.5px] leading-[1.6] text-platinum/85 max-w-[17rem]">{item.description}</p>
+            <span class="ind-go mt-auto pt-6 inline-flex">
+              <span class="ind-go-circle inline-flex items-center justify-center w-9 h-9 rounded-full border border-gold/80 text-gold-light transition-all duration-300">
+                <svg class="ind-arrow w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+              </span>
+            </span>
+          </div>
+        </a>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .ind-bg {
+    background:
+      radial-gradient(ellipse 45% 55% at 82% 8%, rgba(212, 175, 55, 0.08), transparent 70%),
+      radial-gradient(ellipse 60% 50% at 8% 95%, rgba(11, 31, 58, 0.35), transparent 70%),
+      linear-gradient(180deg, #0b0b0b, #0f1012 50%, #0b0b0b);
+  }
+
+  /* ---------- کارت ---------- */
+  .ind-card {
+    min-height: 15.5rem;
+    isolation: isolate;
+    transition: border-color 0.4s ease, transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.5s ease;
+  }
+  .ind-media {
+    width: 100%;
+  }
+  .ind-img {
+    object-position: center;
+    transform: scale(1.02);
+    transition: transform 1.2s cubic-bezier(0.2, 0.8, 0.2, 1), filter 0.6s ease;
+    filter: saturate(0.95) brightness(0.92);
+  }
+  /* موبایل: عکس کل کارت، سایه‌ی پررنگ‌تر برای خوانایی */
+  .ind-shade {
+    background: linear-gradient(90deg, rgba(11, 12, 15, 0.94) 0%, rgba(11, 12, 15, 0.78) 45%, rgba(11, 12, 15, 0.25) 100%);
+  }
+  :global([dir='rtl']) .ind-shade {
+    background: linear-gradient(270deg, rgba(11, 12, 15, 0.94) 0%, rgba(11, 12, 15, 0.78) 45%, rgba(11, 12, 15, 0.25) 100%);
+  }
+  :global([dir='rtl']) .ind-arrow {
+    transform: scaleX(-1);
+  }
+
+  @media (min-width: 1024px) {
+    .ind-card {
+      min-height: clamp(16rem, 19vw, 21rem);
+    }
+    /* دسکتاپ: عکس سمت انتهای کارت، با محو به پنل تیره (مثل طرح) */
+    .ind-media {
+      width: 62%;
+    }
+    .ind-shade {
+      background: linear-gradient(90deg, #0f1013 0%, #0f1013 36%, rgba(15, 16, 19, 0.75) 50%, rgba(15, 16, 19, 0.15) 72%, transparent 100%);
+    }
+    :global([dir='rtl']) .ind-shade {
+      background: linear-gradient(270deg, #0f1013 0%, #0f1013 36%, rgba(15, 16, 19, 0.75) 50%, rgba(15, 16, 19, 0.15) 72%, transparent 100%);
+    }
+  }
+
+  /* هاور */
+  .ind-card:hover {
+    border-color: rgba(212, 175, 55, 0.35);
+    box-shadow: 0 24px 60px -24px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(212, 175, 55, 0.08);
+  }
+  .ind-card:hover .ind-img {
+    transform: scale(1.09);
+    filter: saturate(1.05) brightness(1);
+  }
+  .ind-card:hover .ind-num-rule {
+    width: 4rem;
+    background-color: #d4af37;
+  }
+  .ind-card:hover .ind-go-circle {
+    background: linear-gradient(135deg, #f3e6b3, #d4af37);
+    color: #111;
+    border-color: transparent;
+  }
+  .ind-cta {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+  }
+  .ind-cta:hover {
+    background: linear-gradient(135deg, #f3e6b3, #d4af37);
+    color: #111;
+    border-color: transparent;
+  }
+  .ind-cta:hover .ind-arrow {
+    translate: 4px 0;
+  }
+  :global([dir='rtl']) .ind-cta:hover .ind-arrow {
+    translate: -4px 0;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ind-img, .ind-card { transition: none; }
+  }
+</style>
+
+<script>
+  import gsap from 'gsap';
+
+  function initIndustryGrid() {
+    const section = document.querySelector('.ind-section') as HTMLElement | null;
+    if (!section || section.dataset.inited) return;
+    section.dataset.inited = '1';
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    import('gsap/ScrollTrigger').then(({ ScrollTrigger }) => {
+      gsap.registerPlugin(ScrollTrigger);
+
+      // هدر
+      gsap.timeline({ defaults: { ease: 'power3.out' }, scrollTrigger: { trigger: section, start: 'top 75%', once: true } })
+        .from(section.querySelector('.ind-rule'), { scaleX: 0, transformOrigin: 'left center', duration: 0.8 }, 0)
+        .from(section.querySelectorAll('.ind-line-inner'), { yPercent: 165, duration: 1.1, stagger: 0.12, ease: 'expo.out' }, 0.1)
+        .from(section.querySelectorAll('.ind-reveal'), { opacity: 0, y: 22, duration: 0.9, stagger: 0.12 }, 0.2);
+
+      // کارت‌ها: یکی‌یکی با پرده‌ی عکس
+      const cards = section.querySelectorAll<HTMLElement>('.ind-card');
+      cards.forEach((card, i) => {
+        const img = card.querySelector('.ind-img');
+        const tl = gsap.timeline({
+          defaults: { ease: 'power3.out' },
+          scrollTrigger: { trigger: card, start: 'top 88%', once: true },
+          delay: (i % 3) * 0.12,
+        });
+        tl.from(card, { opacity: 0, y: 40, duration: 0.9 }, 0)
+          .from(img, { scale: 1.25, duration: 1.6, ease: 'expo.out', clearProps: 'transform' }, 0)
+          .from(card.querySelectorAll('h3 span, p, .ind-go'), { opacity: 0, y: 14, duration: 0.7, stagger: 0.08 }, 0.25);
+      });
+    });
+  }
+
+  document.addEventListener('astro:page-load', initIndustryGrid);
+</script>

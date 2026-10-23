@@ -1,0 +1,256 @@
+---
+import type { HomeContent } from '../../i18n/home';
+import type { Locale } from '../../i18n/translations';
+
+interface Props {
+  h: HomeContent;
+  lang: Locale;
+}
+const { h, lang } = Astro.props;
+const dir = lang === 'en' ? 'ltr' : 'rtl';
+const isLatin = lang === 'en';
+---
+
+<!--
+  سکشن دوم: بنر تمام‌عرض — متن روی پنل تیره (چپ)، عکس عمان با لبه‌ی مورب (راست) و خطوط طلایی ظریف.
+  چیدمان فیزیکی در هر سه زبان یکسانه (مثل هیرو)؛ فقط جهت خودِ متن برای fa/ar راست‌به‌چپه.
+-->
+<section class="statement-section relative overflow-hidden" dir="ltr">
+  <!-- پنل تیره با کمی گرادیان -->
+  <div class="statement-panel absolute inset-0"></div>
+
+  <!-- عکس با لبه‌ی مورب -->
+  <div class="statement-media">
+    <img
+      src="/mock/statement-oman.jpg"
+      width="942"
+      height="809"
+      alt=""
+      loading="lazy"
+      decoding="async"
+      class="statement-img absolute inset-0 w-full h-full object-cover"
+    />
+    <!-- محو ملایم لبه‌ی چپ عکس به سمت پنل -->
+    <div class="statement-media-fade absolute inset-0 pointer-events-none"></div>
+  </div>
+
+  <!-- خطوط طلایی (فقط دسکتاپ) -->
+  <svg class="statement-lines pointer-events-none absolute inset-0 w-full h-full hidden md:block" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+    <defs>
+      <linearGradient id="st-gold" x1="0" y1="1" x2="0" y2="0">
+        <stop offset="0" stop-color="#D4AF37" stop-opacity="0" />
+        <stop offset="0.35" stop-color="#D4AF37" stop-opacity="0.85" />
+        <stop offset="1" stop-color="#F3E6B3" stop-opacity="0.9" />
+      </linearGradient>
+    </defs>
+    <!-- خط مورب بلند، موازی لبه‌ی عکس -->
+    <path class="st-line" d="M 36.5 100 L 56.6 0" stroke="url(#st-gold)" stroke-width="1" fill="none" vector-effect="non-scaling-stroke" />
+    <!-- قاب بالا -->
+    <path class="st-line" d="M 63 9 L 51.2 9 L 45.6 37" stroke="#D4AF37" stroke-opacity="0.75" stroke-width="1" fill="none" vector-effect="non-scaling-stroke" />
+    <!-- قاب پایین -->
+    <path class="st-line" d="M 39.6 100 L 43.4 81 L 52 81" stroke="#D4AF37" stroke-opacity="0.55" stroke-width="1" fill="none" vector-effect="non-scaling-stroke" />
+  </svg>
+  <!-- نقطه‌ی درخشان روی گوشه‌ی قاب بالا -->
+  <span class="statement-spark hidden md:block" aria-hidden="true"></span>
+
+  <!-- متن -->
+  <div class="statement-content relative z-10">
+    <div class="statement-text" dir={dir} lang={lang}>
+      <div class="statement-item flex items-center gap-4 mb-6 md:mb-8">
+        <span class="statement-rule block h-px w-12 md:w-20 bg-gold/80 shrink-0"></span>
+        <span class={`text-[11px] md:text-[13px] text-gold-light font-medium ${isLatin ? 'uppercase tracking-[0.32em]' : ''}`}>
+          {h.statement.eyebrow}
+        </span>
+      </div>
+
+      <h2 class="statement-title font-display text-warmwhite text-[2.4rem] leading-[1.08] sm:text-6xl">
+        <span class="statement-line line-mask block"><span class="statement-line-inner block">{h.statement.title}</span></span>
+        <span class="statement-line line-mask block">
+          <span class="statement-line-inner block bg-clip-text text-transparent" style="background-image: linear-gradient(100deg, #F3E6B3 0%, #E6C878 45%, #D4AF37 100%);">
+            {h.statement.highlight}
+          </span>
+        </span>
+      </h2>
+
+      <p class="statement-item mt-6 md:mt-8 text-platinum/90 text-[0.95rem] md:text-lg leading-[1.75] max-w-[34rem]">
+        {h.statement.subtitle}
+      </p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .statement-section {
+    min-height: auto;
+  }
+  .statement-panel {
+    background:
+      radial-gradient(ellipse 60% 70% at 15% 35%, rgba(212, 175, 55, 0.06), transparent 70%),
+      linear-gradient(180deg, #0b0b0b 0%, #111111 50%, #0b0b0b 100%);
+  }
+
+  /* ---------- موبایل: عکس بالا با گوشه‌های مورب، متن پایین ---------- */
+  .statement-media {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 4 / 3.2;
+    overflow: hidden;
+    clip-path: polygon(42% 0%, 100% 0%, 100% 88%, 0% 100%, 0% 46%);
+  }
+  .statement-img {
+    object-position: right top;
+  }
+  .statement-media-fade {
+    background: linear-gradient(180deg, transparent 55%, rgba(11, 11, 11, 0.55) 100%);
+  }
+  .statement-content {
+    padding: 2.25rem 1.5rem 4rem;
+  }
+
+  /* ---------- دسکتاپ: بنر تمام‌عرض ---------- */
+  @media (min-width: 768px) {
+    .statement-section {
+      min-height: clamp(560px, 78vh, 840px);
+      display: flex;
+      align-items: center;
+    }
+    .statement-media {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      right: 0;
+      left: auto;
+      width: 58%;
+      aspect-ratio: auto;
+      clip-path: polygon(34.5% 0%, 100% 0%, 100% 100%, 0% 100%);
+    }
+    .statement-media-fade {
+      background: linear-gradient(90deg, rgba(11, 11, 11, 0.55) 0%, transparent 28%);
+    }
+    .statement-content {
+      width: 100%;
+      padding: 6rem 2.5rem 6rem 5vw;
+    }
+    .statement-text {
+      max-width: 47vw;
+    }
+    .statement-title {
+      font-size: clamp(2.6rem, 4.3vw, 6rem);
+    }
+  }
+  @media (min-width: 1024px) {
+    .statement-line-inner {
+      white-space: nowrap;
+    }
+  }
+
+  /* با non-scaling-stroke واحد dash پیکسل صفحه‌ست، پس یه عدد بزرگ برای کشیدن خط کافیه */
+  .st-line {
+    stroke-dasharray: 3000;
+    stroke-dashoffset: 0;
+  }
+  .statement-spark {
+    position: absolute;
+    left: 63%;
+    top: 9%;
+    width: 7px;
+    height: 7px;
+    margin: -3.5px 0 0 -3.5px;
+    border-radius: 9999px;
+    background: #fff8dc;
+    box-shadow: 0 0 10px 3px rgba(243, 230, 179, 0.85), 0 0 34px 10px rgba(212, 175, 55, 0.45);
+    animation: st-twinkle 3.6s ease-in-out infinite;
+  }
+  @keyframes st-twinkle {
+    0%, 100% { opacity: 0.55; transform: scale(0.8); }
+    50% { opacity: 1; transform: scale(1.15); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .statement-spark { animation: none; }
+  }
+
+  /* ---------- فارسی/عربی: کل ترکیب آینه می‌شه (متن راست، عکس چپ) ----------
+     خود قاب عکس با scaleX(-1) برعکس می‌شه تا برش مورب و محو لبه دقیقاً قرینه‌ی نسخه‌ی انگلیسی باشه */
+  :global(html[dir='rtl']) .statement-media {
+    transform: scaleX(-1);
+  }
+  :global(html[dir='rtl']) .statement-lines {
+    transform: scaleX(-1);
+  }
+  :global(html[dir='rtl']) .statement-spark {
+    left: 37%;
+  }
+  :global(html[dir='rtl']) .statement-panel {
+    background:
+      radial-gradient(ellipse 60% 70% at 85% 35%, rgba(212, 175, 55, 0.06), transparent 70%),
+      linear-gradient(180deg, #0b0b0b 0%, #111111 50%, #0b0b0b 100%);
+  }
+  @media (min-width: 768px) {
+    :global(html[dir='rtl']) .statement-media {
+      right: auto;
+      left: 0;
+    }
+    :global(html[dir='rtl']) .statement-content {
+      padding: 6rem 5vw 6rem 2.5rem;
+    }
+    :global(html[dir='rtl']) .statement-text {
+      margin-left: auto;
+    }
+  }
+</style>
+
+<script>
+  import gsap from 'gsap';
+
+  function initStatement() {
+    const section = document.querySelector('.statement-section') as HTMLElement | null;
+    if (!section || section.dataset.inited) return;
+    section.dataset.inited = '1';
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    import('gsap/ScrollTrigger').then(({ ScrollTrigger }) => {
+      gsap.registerPlugin(ScrollTrigger);
+      const isDesktop = window.matchMedia('(min-width: 768px)').matches;
+      const media = section.querySelector('.statement-media') as HTMLElement | null;
+      const img = section.querySelector('.statement-img');
+
+      const tl = gsap.timeline({
+        defaults: { ease: 'power3.out' },
+        scrollTrigger: { trigger: section, start: 'top 72%', once: true },
+      });
+
+      // عکس با یک برش مورب از راست باز می‌شه
+      if (media) {
+        tl.from(
+          media,
+          {
+            clipPath: isDesktop
+              ? 'polygon(100% 0%, 100% 0%, 100% 100%, 100% 100%)'
+              : 'polygon(100% 0%, 100% 0%, 100% 0%, 100% 0%, 100% 0%)',
+            duration: 1.5,
+            ease: 'expo.inOut',
+          },
+          0
+        );
+      }
+      // خطوط طلایی کشیده می‌شن
+      tl.fromTo('.st-line', { strokeDashoffset: 3000 }, { strokeDashoffset: 0, duration: 1.6, stagger: 0.18, ease: 'power2.inOut' }, 0.6)
+        .from('.statement-spark', { opacity: 0, scale: 0, duration: 0.6 }, 1.6)
+        // متن
+        .from('.statement-rule', { scaleX: 0, transformOrigin: 'left center', duration: 0.8 }, 0.35)
+        .from(section.querySelectorAll('.statement-item'), { opacity: 0, y: 24, duration: 0.9, stagger: 0.12 }, 0.4)
+        .from('.statement-line-inner', { yPercent: 165, duration: 1.2, stagger: 0.14, ease: 'expo.out' }, 0.5);
+
+      // زوم آرومِ عکس با اسکرول
+      if (img) {
+        gsap.fromTo(
+          img,
+          { scale: 1.14 },
+          { scale: 1, ease: 'none', scrollTrigger: { trigger: section, start: 'top bottom', end: 'bottom top', scrub: true } }
+        );
+      }
+    });
+  }
+
+  document.addEventListener('astro:page-load', initStatement);
+</script>

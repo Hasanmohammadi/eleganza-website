@@ -1,44 +1,69 @@
 ---
 import type { HomeContent } from '../../i18n/home';
+import type { Locale } from '../../i18n/translations';
 
 interface Props {
   h: HomeContent;
+  lang: Locale;
 }
-const { h } = Astro.props;
+const { h, lang } = Astro.props;
+const isLatin = lang === 'en';
 
-const items = [h.hero.eyebrow, h.industries.sectionTitle, ...h.whyChoose.features.map((f) => f.title)];
-// این آرایه رو دو بار تکرار می‌کنیم تا حلقه‌ی marquee بدون پرش دیده بشه
-const loopItems = [...items, ...items];
+// اسم شرکت‌های همکار — فعلاً نمونه‌ان؛ تو src/i18n/home.ts → partners.names عوضشون کن
+const names = h.partners.names;
+// دو بار تکرار برای حلقه‌ی بی‌پرش
+const loop = [...names, ...names];
 ---
 
-<div class="marquee-wrap relative overflow-hidden border-y border-gold/15 bg-navy/25 py-3 md:py-4">
-  <div class="marquee-track flex items-center gap-10 md:gap-14 whitespace-nowrap w-max">
-    {loopItems.map((item) => (
-      <span class="flex items-center gap-10 md:gap-14">
-        <span class="font-display text-sm md:text-base tracking-widest2 uppercase text-gold-light/90">
-          {item}
-        </span>
-        <span class="text-gold/40 text-xs">&#10022;</span>
-      </span>
-    ))}
+<!-- نوار شرکای همکار: اسم شرکت‌ها افقی و بی‌وقفه حرکت می‌کنن -->
+<section id="partners" class="partners relative py-12 md:py-16 border-y border-white/[0.06]" aria-label={h.partners.eyebrow}>
+  <div class="flex items-center justify-center gap-4 mb-8 md:mb-10 px-6">
+    <span class="block h-px w-10 md:w-14 bg-gold/60"></span>
+    <span class={`text-[11px] md:text-[12px] font-medium text-gold-light/90 text-center ${isLatin ? 'uppercase tracking-[0.3em]' : ''}`}>{h.partners.eyebrow}</span>
+    <span class="block h-px w-10 md:w-14 bg-gold/60"></span>
   </div>
-</div>
+
+  <div class="partners-mask relative overflow-hidden" dir="ltr">
+    <div class="partners-track flex items-center w-max">
+      {loop.map((name, i) => (
+        <span class="partner flex items-center" aria-hidden={i >= names.length ? 'true' : undefined}>
+          <span class="partner-name font-display whitespace-nowrap text-[1.35rem] md:text-[1.75rem] text-warmwhite/55 transition-colors duration-300">{name}</span>
+          <span class="partner-sep mx-8 md:mx-14 text-gold/50 text-[10px]">&#9670;</span>
+        </span>
+      ))}
+    </div>
+  </div>
+</section>
 
 <style>
-  .marquee-track {
-    animation: marquee-scroll 26s linear infinite;
+  .partners {
+    background:
+      radial-gradient(ellipse 55% 140% at 50% 50%, rgba(11, 31, 58, 0.4), transparent 72%),
+      linear-gradient(180deg, #0b0b0b, #0d0e10 50%, #0b0b0b);
   }
-  @keyframes marquee-scroll {
-    from {
-      transform: translateX(0);
-    }
-    to {
-      transform: translateX(-50%);
-    }
+  .partners-mask {
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+  }
+  .partners-track {
+    animation: partners-scroll 38s linear infinite;
+  }
+  .partners-mask:hover .partners-track {
+    animation-play-state: paused;
+  }
+  .partner-name:hover {
+    color: #f3e6b3;
+  }
+  @keyframes partners-scroll {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
   }
   @media (prefers-reduced-motion: reduce) {
-    .marquee-track {
+    .partners-track {
       animation: none;
+      flex-wrap: wrap;
+      justify-content: center;
+      width: auto;
     }
   }
 </style>

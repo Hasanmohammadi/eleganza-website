@@ -1,53 +1,77 @@
 ---
 import type { HomeContent } from '../../i18n/home';
 
+import type { Locale } from '../../i18n/translations';
+import IndustriesStory from './IndustriesStory.astro';
+
 interface Props {
   h: HomeContent;
+  lang: Locale;
 }
-const { h } = Astro.props;
+const { h, lang } = Astro.props;
+const dir = lang === 'en' ? 'ltr' : 'rtl';
+const isLatin = lang === 'en';
 ---
 
-<section class="hero-section relative min-h-[92vh] flex items-end overflow-hidden">
+<!-- یک سکشن واحد: عکس بکگراند + لوگو/شعار، و بعد با اسکرول صحنه‌ها روی همون بکگراند (سمت چپ) -->
+<section id="home" class="hero-section story-section relative" style="height: 400vh;">
+ <div class="hero-pin sticky top-0 h-screen w-full overflow-hidden isolate flex items-center">
   <div class="hero-bg-wrap absolute inset-0 -z-10">
-    <img src="/mock/hero-bg.jpg" alt="" class="hero-bg-img w-full h-full object-cover" />
-    <div class="absolute inset-0" style="background: linear-gradient(180deg, rgba(13,13,13,0.35) 0%, rgba(13,13,13,0.55) 55%, #0D0D0D 100%);"></div>
-    <!-- بوم Three.js — ذرات درخشان طلایی در عمق سه‌بعدی -->
-    <canvas class="hero-particles absolute inset-0 w-full h-full" aria-hidden="true"></canvas>
-    <!-- هاله‌ی نوری که دنبال موس می‌چرخه -->
-    <div class="hero-spotlight pointer-events-none absolute inset-0"></div>
+    <!-- پارالاکس روی این لایه؛ Ken Burns روی خود عکس (تداخل transform نداشته باشن) -->
+    <div class="hero-parallax absolute inset-0">
+      <picture>
+        <source media="(max-width: 767px)" srcset="/mock/hero-mobile.jpg" />
+        <img src="/mock/hero-desktop.jpg" alt="" class="hero-bg-img w-full h-full object-cover" fetchpriority="high" />
+      </picture>
+    </div>
+    <!-- سایه‌ی ملایم: سمت چپ (محل لوگو) کمی تیره‌تر، بقیه روشن؛ پایین برای اتصال به سکشن بعدی -->
+    <div class="hero-shade absolute inset-0"></div>
   </div>
 
-  <div class="max-w-7xl mx-auto px-6 md:px-10 pb-16 md:pb-24 pt-40 w-full">
-    <span class="hero-eyebrow opacity-0 inline-block mb-5 text-xs md:text-sm tracking-widest2 uppercase text-gold-light">
-      {h.hero.eyebrow}
-    </span>
-
-    <h1 class="font-display text-4xl sm:text-5xl md:text-7xl font-semibold text-warmwhite max-w-3xl leading-[1.1]">
-      <span class="hero-title-line block overflow-hidden">
-        <span class="hero-title-inner block">{h.hero.title}</span>
-      </span>
-      <span class="hero-title-line block overflow-hidden">
-        <span class="hero-title-inner hero-highlight block bg-clip-text text-transparent" style="background-image: linear-gradient(120deg, #F3E6B3, #D4AF37);">
-          {h.hero.highlight}
-        </span>
-      </span>
-    </h1>
-
-    <p class="hero-subtitle opacity-0 mt-6 text-platinum max-w-xl text-base md:text-lg">
-      {h.hero.subtitle}
-    </p>
-    <div class="hero-ctas opacity-0 mt-9 flex flex-col sm:flex-row gap-4">
-      <a href="#industries" class="magnetic-btn px-7 py-3.5 text-sm font-medium tracking-wide text-charcoal text-center" style="background: linear-gradient(135deg, #F3E6B3, #D4AF37);">
-        <span class="magnetic-btn-inner inline-block">{h.hero.ctaPrimary}</span>
-      </a>
-      <a href="#about" class="magnetic-btn px-7 py-3.5 text-sm font-medium tracking-wide text-warmwhite border border-platinum/30 hover:border-gold/60 transition-colors text-center">
-        <span class="magnetic-btn-inner inline-block">{h.hero.ctaSecondary}</span>
-      </a>
+  <!-- بلوک لوگو + شعار همیشه سمت چپِ صفحه‌ست (برای fa/ar هم) -->
+  <div class="hero-scene-0 relative z-[5] w-full px-6 md:px-10 pt-24 pb-24 md:pb-28" dir="ltr">
+    <div class="hero-brand mx-auto md:mx-0 md:ml-[4vw] lg:ml-[7vw] flex flex-col items-center text-center w-full max-w-[22rem] md:max-w-[30rem] lg:max-w-[34rem]">
+      <img src="/brand/logo-full.png" alt="Eleganza United Business" width="640" height="482"
+           class="hero-logo opacity-0 w-[68%] md:w-[82%] h-auto drop-shadow-[0_8px_40px_rgba(0,0,0,0.45)]" />
+      <span class="hero-rule opacity-0 mt-7 md:mt-9 block h-px w-24 md:w-32 bg-gradient-to-r from-transparent via-gold to-transparent"></span>
+      <p class="hero-slogan mt-6 md:mt-7 font-display text-warmwhite text-2xl sm:text-3xl md:text-4xl leading-snug drop-shadow-[0_2px_18px_rgba(0,0,0,0.55)]"
+         dir={dir} lang={lang}>
+        <span class="hero-slogan-line line-mask block"><span class="hero-slogan-inner block">{h.hero.slogan1}</span></span>
+        <span class="hero-slogan-line line-mask block"><span class="hero-slogan-inner hero-highlight block bg-clip-text text-transparent" style="background-image: linear-gradient(120deg, #F3E6B3, #D4AF37);">{h.hero.slogan2}</span></span>
+      </p>
+      <div class="hero-ctas opacity-0 mt-9 flex flex-col sm:flex-row gap-3 md:gap-4 w-full sm:w-auto" dir={dir}>
+        <a href="#industries" class={`magnetic-btn hero-btn hero-btn-solid inline-flex items-center justify-center gap-3 px-7 py-3.5 rounded-full text-[12px] md:text-[13px] font-semibold text-charcoal ${isLatin ? 'uppercase tracking-[0.18em]' : ''}`}>
+          <span class="magnetic-btn-inner inline-flex items-center gap-3">{h.hero.ctaPrimary}<svg class="hero-arrow w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg></span>
+        </a>
+        <a href="#contact" class={`magnetic-btn hero-btn hero-btn-outline inline-flex items-center justify-center px-7 py-3.5 rounded-full border border-gold/70 text-gold-light text-[12px] md:text-[13px] font-medium backdrop-blur-sm ${isLatin ? 'uppercase tracking-[0.18em]' : ''}`}>
+          <span class="magnetic-btn-inner inline-block">{h.hero.ctaSecondary}</span>
+        </a>
+      </div>
     </div>
   </div>
+
+
+  <IndustriesStory h={h} />
+ </div>
 </section>
 
 <style>
+  .hero-btn-solid {
+    background: linear-gradient(135deg, #f3e6b3, #e2bf6a 55%, #d4af37);
+    box-shadow: 0 10px 30px -12px rgba(212, 175, 55, 0.6);
+  }
+  .hero-btn-outline {
+    background: rgba(11, 11, 11, 0.25);
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+  }
+  .hero-btn-outline:hover {
+    background: linear-gradient(135deg, #f3e6b3, #d4af37);
+    color: #111;
+    border-color: transparent;
+  }
+  :global([dir='rtl']) .hero-arrow {
+    transform: scaleX(-1);
+  }
   .hero-bg-img {
     animation: kenburns 24s ease-in-out infinite alternate;
   }
@@ -57,14 +81,18 @@ const { h } = Astro.props;
   }
   @media (prefers-reduced-motion: reduce) {
     .hero-bg-img { animation: none; }
+    .hero-section { height: auto !important; }
+    .hero-pin { position: static !important; height: auto !important; min-height: 100vh; flex-direction: column; justify-content: center; }
   }
-  .hero-spotlight {
-    background: radial-gradient(280px circle at var(--sx, 50%) var(--sy, 30%), rgba(212, 175, 55, 0.16), transparent 70%);
-    transition: opacity 0.4s ease;
-    opacity: 0;
+  .hero-shade {
+    background:
+      linear-gradient(90deg, rgba(13,13,13,0.62) 0%, rgba(13,13,13,0.30) 42%, rgba(13,13,13,0) 70%),
+      linear-gradient(180deg, rgba(13,13,13,0.18) 0%, rgba(13,13,13,0) 35%, rgba(13,13,13,0.85) 100%);
   }
-  .hero-spotlight.is-active {
-    opacity: 1;
+  @media (max-width: 767px) {
+    .hero-shade {
+      background: linear-gradient(180deg, rgba(13,13,13,0.50) 0%, rgba(13,13,13,0.50) 55%, rgba(13,13,13,0.88) 100%);
+    }
   }
 </style>
 
@@ -80,48 +108,12 @@ const { h } = Astro.props;
     const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     // ---------- تایم‌لاین ورود قوی‌تر (ماسک‌دار برای عنوان) ----------
-    gsap.set('.hero-title-inner', { yPercent: 120, rotate: 4 });
-    const tl = gsap.timeline({ defaults: { ease: 'power4.out', duration: 1.1 }, delay: 0.15 });
-    tl.fromTo('.hero-eyebrow', { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.7 })
-      .to('.hero-title-inner', { yPercent: 0, rotate: 0, duration: 1.2, stagger: 0.12, ease: 'expo.out' }, '-=0.35')
-      .fromTo('.hero-subtitle', { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.8 }, '-=0.6')
-      .fromTo('.hero-ctas', { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.8 }, '-=0.6');
-
-    // ---------- پارالاکس تصویر پس‌زمینه موقع اسکرول ----------
-    if (!prefersReduced) {
-      import('gsap/ScrollTrigger').then(({ ScrollTrigger }) => {
-        gsap.registerPlugin(ScrollTrigger);
-        const heroImg = document.querySelector('.hero-bg-img');
-        if (heroImg) {
-          gsap.to(heroImg, {
-            yPercent: 16,
-            ease: 'none',
-            scrollTrigger: { trigger: heroSection, start: 'top top', end: 'bottom top', scrub: true },
-          });
-        }
-      });
-    }
-
-    // ---------- هاله‌ی نوری دنبال‌کننده‌ی موس ----------
-    if (!prefersReduced && window.matchMedia('(hover: hover)').matches) {
-      const spotlight = document.querySelector('.hero-spotlight') as HTMLElement | null;
-      if (spotlight) {
-        const onMove = (e: MouseEvent) => {
-          const rect = heroSection.getBoundingClientRect();
-          if (e.clientY > rect.bottom || e.clientY < rect.top) {
-            spotlight.classList.remove('is-active');
-            return;
-          }
-          spotlight.classList.add('is-active');
-          const x = ((e.clientX - rect.left) / rect.width) * 100;
-          const y = ((e.clientY - rect.top) / rect.height) * 100;
-          spotlight.style.setProperty('--sx', `${x}%`);
-          spotlight.style.setProperty('--sy', `${y}%`);
-        };
-        window.addEventListener('mousemove', onMove);
-        document.addEventListener('astro:before-swap', () => window.removeEventListener('mousemove', onMove), { once: true });
-      }
-    }
+    gsap.set('.hero-slogan-inner', { yPercent: 170, rotate: 3 });
+    const tl = gsap.timeline({ defaults: { ease: 'power4.out' }, delay: 0.15 });
+    tl.fromTo('.hero-logo', { opacity: 0, y: 24, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 1.3, ease: 'expo.out' })
+      .fromTo('.hero-rule', { opacity: 0, scaleX: 0 }, { opacity: 1, scaleX: 1, duration: 0.8 }, '-=0.7')
+      .to('.hero-slogan-inner', { yPercent: 0, rotate: 0, duration: 1.1, stagger: 0.14, ease: 'expo.out' }, '-=0.5')
+      .fromTo('.hero-ctas', { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.8 }, '-=0.5');
 
     // ---------- دکمه‌های مگنتیک ----------
     if (!prefersReduced && window.matchMedia('(hover: hover)').matches) {
@@ -147,113 +139,6 @@ const { h } = Astro.props;
           xToInner?.(0);
           yToInner?.(0);
         });
-      });
-    }
-
-    // ---------- بوم ذرات درخشان سه‌بعدی (Three.js) ----------
-    if (!prefersReduced) {
-      import('three').then((THREE) => {
-        const canvas = document.querySelector('.hero-particles') as HTMLCanvasElement | null;
-        const wrap = document.querySelector('.hero-bg-wrap') as HTMLElement | null;
-        if (!canvas || !wrap) return;
-
-        const isSmall = window.innerWidth < 768;
-        const particleCount = isSmall ? 70 : 150;
-
-        const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: false });
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
-
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 100);
-        camera.position.z = 11;
-
-        const positions = new Float32Array(particleCount * 3);
-        const speeds = new Float32Array(particleCount);
-        for (let i = 0; i < particleCount; i++) {
-          positions[i * 3] = (Math.random() - 0.5) * 20;
-          positions[i * 3 + 1] = (Math.random() - 0.5) * 11;
-          positions[i * 3 + 2] = (Math.random() - 0.5) * 12;
-          speeds[i] = 0.3 + Math.random() * 0.7;
-        }
-        const geometry = new THREE.BufferGeometry();
-        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-
-        // بافت گرد نرم (glow) برای هر ذره — به‌جای نقطه‌ی تخت
-        const glowCanvas = document.createElement('canvas');
-        glowCanvas.width = 64;
-        glowCanvas.height = 64;
-        const ctx = glowCanvas.getContext('2d')!;
-        const grad = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
-        grad.addColorStop(0, 'rgba(255,247,224,1)');
-        grad.addColorStop(0.35, 'rgba(212,175,55,0.9)');
-        grad.addColorStop(1, 'rgba(212,175,55,0)');
-        ctx.fillStyle = grad;
-        ctx.fillRect(0, 0, 64, 64);
-        const glowTexture = new THREE.CanvasTexture(glowCanvas);
-
-        const material = new THREE.PointsMaterial({
-          map: glowTexture,
-          size: 0.42,
-          transparent: true,
-          opacity: 0.85,
-          sizeAttenuation: true,
-          blending: THREE.AdditiveBlending,
-          depthWrite: false,
-        });
-        const points = new THREE.Points(geometry, material);
-        scene.add(points);
-
-        let mouseX = 0;
-        let mouseY = 0;
-        const onMouseMove = (e: MouseEvent) => {
-          mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
-          mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
-        };
-        window.addEventListener('mousemove', onMouseMove);
-
-        function resize() {
-          if (!canvas || !wrap) return;
-          const w = wrap.clientWidth;
-          const hgt = wrap.clientHeight;
-          renderer.setSize(w, hgt, false);
-          camera.aspect = w / hgt;
-          camera.updateProjectionMatrix();
-        }
-        resize();
-        window.addEventListener('resize', resize);
-
-        let rafId: number;
-        const clock = new THREE.Clock();
-        const posAttr = geometry.attributes.position as THREE.BufferAttribute;
-        function animate() {
-          rafId = requestAnimationFrame(animate);
-          const t = clock.getElapsedTime();
-          for (let i = 0; i < particleCount; i++) {
-            posAttr.array[i * 3 + 1] += Math.sin(t * 0.4 * speeds[i] + i) * 0.0025;
-            posAttr.array[i * 3] += Math.cos(t * 0.3 * speeds[i] + i) * 0.0018;
-          }
-          posAttr.needsUpdate = true;
-          points.rotation.y = t * 0.02;
-          camera.position.x += (mouseX * 0.7 - camera.position.x) * 0.03;
-          camera.position.y += (-mouseY * 0.5 - camera.position.y) * 0.03;
-          camera.lookAt(0, 0, 0);
-          renderer.render(scene, camera);
-        }
-        animate();
-
-        document.addEventListener(
-          'astro:before-swap',
-          () => {
-            cancelAnimationFrame(rafId);
-            window.removeEventListener('mousemove', onMouseMove);
-            window.removeEventListener('resize', resize);
-            geometry.dispose();
-            material.dispose();
-            glowTexture.dispose();
-            renderer.dispose();
-          },
-          { once: true }
-        );
       });
     }
   }
